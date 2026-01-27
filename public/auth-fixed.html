@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 GestNotes - Connexion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4361ee',
+                        secondary: '#7209b7'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .animate-slide-in-right {
+            animation: slideInRight 0.6s ease-out;
+        }
+
+        .animate-slide-in-left {
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .input-glow:focus {
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.3);
+        }
+        
+        .role-selected {
+            border-color: #4361ee !important;
+            background-color: #4361ee !important;
+            color: white !important;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
+
+    <!-- Particules d'arrière-plan -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div
+            class="absolute top-20 left-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float">
+        </div>
+        <div class="absolute top-40 right-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"
+            style="animation-delay: 2s;"></div>
+        <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"
+            style="animation-delay: 4s;"></div>
+    </div>
+
+    <!-- Container principal -->
+    <div
+        class="relative bg-white rounded-3xl shadow-2xl w-full max-w-5xl flex overflow-hidden backdrop-blur-sm bg-opacity-95 animate-fade-in">
+
+        <!-- LEFT SIDE: Illustration -->
+        <div
+            class="hidden lg:flex w-1/2 gradient-bg items-center justify-center p-12 relative overflow-hidden animate-slide-in-left">
+            <!-- Décoration -->
+            <div class="absolute top-0 left-0 w-full h-full opacity-10">
+                <div class="absolute top-10 right-10 w-40 h-40 border-4 border-white rounded-full"></div>
+                <div class="absolute bottom-20 left-10 w-32 h-32 border-4 border-white rounded-full"></div>
+            </div>
+
+            <div class="text-white text-center relative z-10">
+                <div class="mb-8 animate-float">
+                    <i class="fas fa-graduation-cap text-8xl drop-shadow-2xl"></i>
+                </div>
+                <h1 class="text-4xl font-bold mb-4 drop-shadow-lg">GestNotes</h1>
+                <p class="text-xl mb-6 opacity-90">Système de Gestion des Notes</p>
+                <div class="flex justify-center gap-4 text-sm">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Sécurisé</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Simple</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Rapide</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE: Formulaire -->
+        <div class="w-full lg:w-1/2 p-12 animate-slide-in-right">
+            <!-- Titre de la page -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-sign-in-alt text-primary"></i>
+                    Connexion
+                </h2>
+                <p class="text-gray-600 mt-1">Connectez-vous à votre compte</p>
+            </div>
+
+            <!-- Messages d'erreur/succès -->
+            <div id="form-error" class="hidden mb-4"></div>
+            <div id="form-success" class="hidden mb-4"></div>
+
+            <!-- FORMULAIRE DE CONNEXION -->
+            <form id="login-form" class="space-y-6">
+                <!-- Sélection du rôle -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Je suis</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button type="button"
+                            class="role-btn py-3 px-4 border-2 border-gray-200 rounded-lg text-sm font-medium transition-all hover:border-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                            data-role="enseignant">
+                            <i class="fas fa-chalkboard-teacher mb-1"></i>
+                            <div>Enseignant</div>
+                        </button>
+                        <button type="button"
+                            class="role-btn py-3 px-4 border-2 border-gray-200 rounded-lg text-sm font-medium transition-all hover:border-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                            data-role="etudiant">
+                            <i class="fas fa-user-graduate mb-1"></i>
+                            <div>Étudiant</div>
+                        </button>
+                        <button type="button"
+                            class="role-btn py-3 px-4 border-2 border-gray-200 rounded-lg text-sm font-medium transition-all hover:border-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                            data-role="admin">
+                            <i class="fas fa-user-shield mb-1"></i>
+                            <div>Admin</div>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400"></i>
+                        </div>
+                        <input id="email" type="email" required
+                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent input-glow transition-all"
+                            placeholder="exemple@iua.ci">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Mot de passe</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input id="password" type="password" required
+                            class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent input-glow transition-all"
+                            placeholder="••••••••">
+                        <button type="button" id="toggle-password"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <i class="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                        <span class="ml-2 text-sm text-gray-600">Se souvenir de moi</span>
+                    </label>
+                    <a href="#" class="text-sm text-primary hover:underline">Mot de passe oublié?</a>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-primary text-white py-3 px-4 rounded-xl font-medium hover:bg-primary-dark transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    Se connecter
+                </button>
+
+                <!-- Informations d'identification pour admin (caché par défaut) -->
+                <div id="admin-credentials" class="hidden mt-8 pt-6 border-t border-gray-200">
+                    <div class="text-center text-sm text-gray-600">
+                        <p class="font-medium mb-2">Accès rapide administrateur :</p>
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <p><span class="font-medium">Email :</span> admin@iua.ci</p>
+                            <p><span class="font-medium">Mot de passe :</span> admin123</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informations d'identification pour enseignant (caché par défaut) -->
+                <div id="enseignant-credentials" class="hidden mt-6 pt-6 border-t border-gray-200">
+                    <div class="text-center text-sm text-gray-600">
+                        <p class="font-medium mb-2">Accès rapide enseignant :</p>
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <p><span class="font-medium">Email :</span> mamadou.diallo@iua.ci</p>
+                            <p><span class="font-medium">Mot de passe :</span> ENS01</p>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Gestion des rôles
+        document.addEventListener('DOMContentLoaded', function() {
+            let selectedRole = '';
+            const roleButtons = document.querySelectorAll('.role-btn');
+            const adminCredentials = document.getElementById('admin-credentials');
+            const enseignantCredentials = document.getElementById('enseignant-credentials');
+            
+            // Initialisation des boutons de rôle
+            roleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const role = this.getAttribute('data-role');
+                    
+                    // Supprimer la classe selected de tous les boutons
+                    roleButtons.forEach(btn => {
+                        btn.classList.remove('role-selected');
+                        btn.style.borderColor = '#e5e7eb';
+                        btn.style.backgroundColor = 'transparent';
+                        btn.style.color = '#374151';
+                    });
+                    
+                    // Ajouter la classe selected au bouton cliqué
+                    this.classList.add('role-selected');
+                    this.style.borderColor = '#4361ee';
+                    this.style.backgroundColor = '#4361ee';
+                    this.style.color = 'white';
+                    
+                    // Mettre à jour le rôle sélectionné
+                    selectedRole = role;
+                    
+                    // Gérer l'affichage des identifiants
+                    if (role === 'admin') {
+                        adminCredentials.classList.remove('hidden');
+                        enseignantCredentials.classList.add('hidden');
+                    } else if (role === 'enseignant') {
+                        adminCredentials.classList.add('hidden');
+                        enseignantCredentials.classList.remove('hidden');
+                    } else {
+                        adminCredentials.classList.add('hidden');
+                        enseignantCredentials.classList.add('hidden');
+                    }
+                });
+            });
+            
+            // Gestion de l'affichage/masquage du mot de passe
+            const togglePassword = document.getElementById('toggle-password');
+            const passwordInput = document.getElementById('password');
+            
+            if (togglePassword && passwordInput) {
+                togglePassword.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    this.querySelector('i').classList.toggle('fa-eye');
+                    this.querySelector('i').classList.toggle('fa-eye-slash');
+                });
+            }
+            
+            // Gestion du formulaire de connexion
+            const loginFormElement = document.getElementById('login-form');
+            if (loginFormElement) {
+                loginFormElement.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    
+                    if (!selectedRole) {
+                        showError('Veuillez sélectionner un rôle');
+                        return;
+                    }
+                    
+                    if (!email || !password) {
+                        showError('Veuillez remplir tous les champs');
+                        return;
+                    }
+                    
+                    // CONNEXION ADMIN
+                    if (selectedRole === 'admin') {
+                        if (email === 'admin@iua.ci' && password === 'admin123') {
+                            const adminData = {
+                                id_admin: 1,
+                                nom_admin: 'Admin',
+                                prenom_admin: 'Système',
+                                email_admin: 'admin@iua.ci',
+                                role: 'admin',
+                                matricule: 'ADM001'
+                            };
+                            
+                            localStorage.setItem('admin', JSON.stringify(adminData));
+                            localStorage.setItem('user', JSON.stringify({
+                                id: 1,
+                                nom: 'Admin',
+                                prenom: 'Système',
+                                email: 'admin@iua.ci',
+                                role: 'admin',
+                                matricule: 'ADM001'
+                            }));
+                            
+                            showSuccess('Connexion admin réussie! Redirection...');
+                            
+                            setTimeout(() => {
+                                window.location.href = 'Admin/inscriptions.html';
+                            }, 1500);
+                        } else {
+                            showError('Identifiants admin incorrects');
+                        }
+                    }
+                    
+                    // CONNEXION ENSEIGNANT - CORRIGÉ ICI !
+                    else if (selectedRole === 'enseignant') {
+                        // Vérifier les identifiants des enseignants existants
+                        const enseignantsValides = [
+                            { email: 'mamadou.diallo@iua.ci', password: 'ENS01', matricule: 'ENS01', nom: 'Diallo', prenom: 'Mamadou' },
+                            { email: 'aminata.traore@iua.ci', password: 'ENS02', matricule: 'ENS02', nom: 'Traore', prenom: 'Aminata' },
+                            { email: 'jeanpaul.kone@iua.ci', password: 'ENS03', matricule: 'ENS03', nom: 'Kone', prenom: 'Jean-Paul' }
+                        ];
+                        
+                        const enseignantValide = enseignantsValides.find(ens => 
+                            ens.email === email && ens.password === password
+                        );
+                        
+                        if (enseignantValide) {
+                            // CORRECTION : Utiliser le vrai matricule de l'enseignant, pas PROF001
+                            const userData = {
+                                id: enseignantValide.matricule,
+                                nom: enseignantValide.nom,
+                                prenom: enseignantValide.prenom,
+                                email: enseignantValide.email,
+                                role: 'enseignant',
+                                matricule: enseignantValide.matricule  // VRAI MATRICULE : ENS01, ENS02 ou ENS03
+                            };
+                            
+                            localStorage.setItem('user', JSON.stringify(userData));
+                            showSuccess(`Connexion réussie en tant qu'enseignant ${enseignantValide.matricule}!`);
+                            
+                            setTimeout(() => {
+                                window.location.href = 'enseignant/index.html';
+                            }, 1500);
+                        } else {
+                            showError('Email ou mot de passe enseignant incorrect');
+                        }
+                    }
+                    
+                    // CONNEXION ÉTUDIANT
+                    else if (selectedRole === 'etudiant') {
+                        // Pour les étudiants, on utilise leur vrai matricule de la base
+                        // Par exemple : L1GI01, L1GI02, etc. avec mot de passe = matricule
+                        if (password && email.endsWith('@iua.ci')) {
+                            // Vérifier si c'est un matricule d'étudiant valide
+                            const matriculeFromEmail = email.split('@')[0];
+                            const etudiantsPrefixes = ['L1GI', 'L2GI', 'L3GI', 'L1MIAGE', 'L2MIAGE', 'L3MIAGE'];
+                            const isEtudiantEmail = etudiantsPrefixes.some(prefix => matriculeFromEmail.startsWith(prefix));
+                            
+                            if (isEtudiantEmail) {
+                                // Pour simplifier, on accepte tout email étudiant @iua.ci avec mot de passe = matricule
+                                const userData = {
+                                    id: matriculeFromEmail,
+                                    nom: 'Étudiant',
+                                    prenom: matriculeFromEmail,
+                                    email: email,
+                                    role: 'etudiant',
+                                    matricule: matriculeFromEmail
+                                };
+                                
+                                localStorage.setItem('user', JSON.stringify(userData));
+                                showSuccess('Connexion étudiante réussie!');
+                                
+                                setTimeout(() => {
+                                    window.location.href = 'etudiant/index.html';
+                                }, 1500);
+                            } else {
+                                showError('Email étudiant non reconnu');
+                            }
+                        } else {
+                            showError('Identifiants étudiant incorrects');
+                        }
+                    }
+                    
+                });
+            }
+            
+            // Fonctions pour afficher les messages
+            function showError(message) {
+                const errorDiv = document.getElementById('form-error');
+                errorDiv.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                errorDiv.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    errorDiv.classList.add('hidden');
+                }, 5000);
+            }
+            
+            function showSuccess(message) {
+                const successDiv = document.getElementById('form-success');
+                successDiv.innerHTML = `
+                    <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                successDiv.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    successDiv.classList.add('hidden');
+                }, 5000);
+            }
+            
+            // Sélectionner enseignant par défaut pour faciliter le test
+            const enseignantBtn = document.querySelector('.role-btn[data-role="enseignant"]');
+            if (enseignantBtn) {
+                enseignantBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>

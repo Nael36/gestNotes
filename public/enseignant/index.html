@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>🎓 GestNotes - Espace Enseignant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../js/auth-simple.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4361ee',
+                        secondary: '#7209b7',
+                        accent: '#f72585'
+                    },
+                    screens: {
+                        'xs': '475px',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @media (max-width: 640px) {
+            .mobile-stack { flex-direction: column !important; }
+            .mobile-full { width: 100% !important; }
+            .mobile-center { text-align: center !important; }
+            .mobile-text-sm { font-size: 0.875rem !important; }
+            .mobile-p-4 { padding: 1rem !important; }
+            .mobile-gap-3 { gap: 0.75rem !important; }
+        }
+        
+        /* Améliorations pour très petits écrans */
+        @media (max-width: 375px) {
+            .tiny-text-lg { font-size: 1.125rem !important; }
+            .tiny-text-base { font-size: 0.875rem !important; }
+            .tiny-p-3 { padding: 0.75rem !important; }
+        }
+        
+        /* Pour éviter le débordement horizontal */
+        .overflow-wrap-break {
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+
+    <!-- Navbar Responsive -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50 border-b-4 border-primary">
+        <div class="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-14 sm:h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-white text-sm sm:text-xl"></i>
+                    </div>
+                    <span class="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                        GestNotes
+                    </span>
+                </a>
+
+                <!-- Menu Hamburger pour mobile -->
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-lg hover:bg-slate-100">
+                    <i class="fas fa-bars text-slate-700 text-lg"></i>
+                </button>
+
+                <!-- Desktop Menu (caché sur mobile) -->
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="index.html" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg bg-primary text-white font-medium flex items-center gap-2">
+                        <i class="fas fa-home text-sm sm:text-base"></i>
+                        <span class="hidden sm:inline">Accueil</span>
+                    </a>
+                    <a href="periodes.html" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2">
+                        <i class="fas fa-calendar-alt text-sm sm:text-base"></i>
+                        <span class="hidden sm:inline">Périodes</span>
+                    </a>
+                    <a href="matieres.html" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2">
+                        <i class="fas fa-book text-sm sm:text-base"></i>
+                        <span class="hidden sm:inline">Matières</span>
+                    </a>
+                    <a href="evaluations.html" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2">
+                        <i class="fas fa-chart-line text-sm sm:text-base"></i>
+                        <span class="hidden sm:inline">Évaluations</span>
+                    </a>
+                </div>
+
+                <!-- User Info & Déconnexion -->
+                <div class="hidden md:flex items-center gap-3">
+                    <div class="flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-lg">
+                        <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                        <span id="navbar-username" class="text-sm font-medium text-slate-700 overflow-wrap-break max-w-[150px]">Chargement...</span>
+                    </div>
+                    <button onclick="auth.logout()" class="flex items-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-medium">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="hidden sm:inline">Déconnecter</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Menu Mobile (déroulant) -->
+            <div id="mobile-menu" class="md:hidden hidden py-4 border-t border-slate-200">
+                <div class="flex flex-col space-y-3">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white text-sm"></i>
+                            </div>
+                            <span id="mobile-username" class="text-sm font-medium text-slate-700">Chargement...</span>
+                        </div>
+                        <button onclick="auth.logout()" class="flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-sm">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Quitter</span>
+                        </button>
+                    </div>
+                    
+                    <a href="index.html" class="flex items-center gap-3 px-4 py-3 bg-primary text-white rounded-lg">
+                        <i class="fas fa-home"></i>
+                        <span>Accueil</span>
+                    </a>
+                    <a href="periodes.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 rounded-lg">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Périodes</span>
+                    </a>
+                    <a href="matieres.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 rounded-lg">
+                        <i class="fas fa-book"></i>
+                        <span>Matières</span>
+                    </a>
+                    <a href="evaluations.html" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 rounded-lg">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Évaluations</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Responsive -->
+    <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div class="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
+                <!-- Partie gauche : Titre et description -->
+                <div class="flex-1 min-w-0">
+                    <h1 class="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 flex flex-col xs:flex-row xs:items-center gap-2 sm:gap-3 mobile-center">
+                        <div class="flex items-center gap-2 sm:gap-3 justify-center xs:justify-start">
+                            <i class="fas fa-chalkboard-teacher text-lg sm:text-xl md:text-2xl"></i>
+                            <span class="overflow-wrap-break">Espace Enseignant</span>
+                        </div>
+                    </h1>
+                    <p class="text-sm xs:text-base sm:text-lg text-white/90 mobile-center xs:text-left">
+                        Bienvenue dans votre espace de gestion académique
+                    </p>
+                </div>
+
+                <!-- Partie droite : Informations enseignant -->
+                <div class="xs:self-start mt-2 xs:mt-0">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 sm:px-5 sm:py-4 border border-white/20">
+                        <div class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold overflow-wrap-break" id="enseignant-name">Chargement...</div>
+                        <div class="text-xs sm:text-sm md:text-base text-white/80 mt-1" id="enseignant-matricule">Chargement...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Responsive -->
+    <main class="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+        
+        <!-- Cartes de statistiques -->
+        <div class="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 hover:shadow-lg transition-all tiny-p-3">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-book text-blue-600 text-sm sm:text-base md:text-xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm text-gray-500">Total</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-bold text-gray-800 tiny-text-lg" id="total-enseignements">0</div>
+                <div class="text-xs sm:text-sm text-gray-600 tiny-text-base">Enseignements</div>
+            </div>
+
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 hover:shadow-lg transition-all tiny-p-3">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-user-graduate text-green-600 text-sm sm:text-base md:text-xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm text-gray-500">Total</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-bold text-gray-800 tiny-text-lg" id="total-etudiants">0</div>
+                <div class="text-xs sm:text-sm text-gray-600 tiny-text-base">Étudiants</div>
+            </div>
+
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 hover:shadow-lg transition-all tiny-p-3">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-chart-line text-purple-600 text-sm sm:text-base md:text-xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm text-gray-500">Total</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-bold text-gray-800 tiny-text-lg" id="total-evaluations">0</div>
+                <div class="text-xs sm:text-sm text-gray-600 tiny-text-base">Évaluations</div>
+            </div>
+
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 hover:shadow-lg transition-all tiny-p-3">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-calendar-alt text-orange-600 text-sm sm:text-base md:text-xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm text-gray-500">Actives</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-bold text-gray-800 tiny-text-lg" id="active-periodes">0</div>
+                <div class="text-xs sm:text-sm text-gray-600 tiny-text-base">Périodes</div>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
+            <a href="evaluations.html" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-all transform hover:scale-[1.02] active:scale-95 tiny-p-3">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-chart-line text-lg sm:text-xl md:text-2xl"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-base sm:text-lg font-bold overflow-wrap-break">Évaluations</h3>
+                        <p class="text-xs sm:text-sm opacity-90 overflow-wrap-break">Gérer les notes</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="matieres.html" class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-all transform hover:scale-[1.02] active:scale-95 tiny-p-3">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-book text-lg sm:text-xl md:text-2xl"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-base sm:text-lg font-bold overflow-wrap-break">Matières</h3>
+                        <p class="text-xs sm:text-sm opacity-90 overflow-wrap-break">Consulter les matières</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="periodes.html" class="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-all transform hover:scale-[1.02] active:scale-95 tiny-p-3">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-calendar-alt text-lg sm:text-xl md:text-2xl"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-base sm:text-lg font-bold overflow-wrap-break">Périodes</h3>
+                        <p class="text-xs sm:text-sm opacity-90 overflow-wrap-break">Gérer les périodes</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="#" onclick="showStats()" class="bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-all transform hover:scale-[1.02] active:scale-95 tiny-p-3">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-chart-bar text-lg sm:text-xl md:text-2xl"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-base sm:text-lg font-bold overflow-wrap-break">Statistiques</h3>
+                        <p class="text-xs sm:text-sm opacity-90 overflow-wrap-break">Voir les stats</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Mes enseignements -->
+        <div class="bg-white rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 mb-6 sm:mb-8">
+            <div class="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-3 xs:gap-4 mb-4 sm:mb-6">
+                <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2 sm:gap-3 mobile-center xs:justify-start">
+                    <i class="fas fa-chalkboard-teacher text-primary"></i>
+                    <span class="overflow-wrap-break">Mes Enseignements</span>
+                </h2>
+                <a href="evaluations.html" class="text-primary hover:underline font-medium text-sm sm:text-base text-center xs:text-right">
+                    Voir tout <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+            <div id="enseignements-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div class="text-center py-6 sm:py-8 text-gray-500">
+                    <i class="fas fa-spinner fa-spin text-xl sm:text-2xl md:text-3xl mb-2 sm:mb-3"></i>
+                    <p class="text-sm sm:text-base">Chargement des enseignements...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dernières évaluations -->
+        <div class="bg-white rounded-xl sm:rounded-2xl shadow p-4 sm:p-6">
+            <div class="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-3 xs:gap-4 mb-4 sm:mb-6">
+                <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2 sm:gap-3 mobile-center xs:justify-start">
+                    <i class="fas fa-chart-line text-primary"></i>
+                    <span class="overflow-wrap-break">Mes Dernières Évaluations</span>
+                </h2>
+                <a href="evaluations.html" class="text-primary hover:underline font-medium text-sm sm:text-base text-center xs:text-right">
+                    Voir tout <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+            <div id="recent-evaluations" class="space-y-3 sm:space-y-4">
+                <div class="text-center py-6 sm:py-8 text-gray-500">
+                    <i class="fas fa-spinner fa-spin text-xl sm:text-2xl md:text-3xl mb-2 sm:mb-3"></i>
+                    <p class="text-sm sm:text-base">Chargement des évaluations...</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Menu mobile toggle script -->
+    <script>
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+    </script>
+
+    <script>
+        let enseignantData = null;
+        const API_URL = 'http://localhost:5000/api'; // URL de votre API
+
+        // Charger les informations de l'enseignant
+        async function loadEnseignantInfo() {
+            try {
+                // VÉRIFICATION D'AUTHENTIFICATION
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (!user) {
+                    window.location.href = '../auth-fixed.html';
+                    return;
+                }
+                
+                // Mettre à jour le nom partout
+                const displayName = `${user.nom} ${user.prenom}`;
+                document.getElementById('navbar-username').textContent = displayName;
+                document.getElementById('mobile-username').textContent = displayName;
+                document.getElementById('enseignant-name').textContent = displayName;
+                document.getElementById('enseignant-matricule').textContent = `Matricule: ${user.matricule || user.id}`;
+                
+                // Charger les enseignements de l'enseignant
+                await loadEnseignements(user.matricule || user.id);
+                
+                // Charger les statistiques
+                await loadStatistics(user.matricule || user.id);
+                
+            } catch (error) {
+                console.error('Erreur chargement infos enseignant:', error);
+                if (error.message === 'Session expirée') {
+                    window.location.href = '../auth-fixed.html';
+                }
+            }
+        }
+
+        // Charger les enseignements (matières attribuées à l'enseignant)
+        async function loadEnseignements(matricule) {
+            try {
+                // NOTE: Vous devez avoir une table "enseignement" qui lie enseignant-matière
+                // Ou une vue dans votre API. Pour le moment, on va utiliser une approche simple
+                
+                // 1. Récupérer toutes les matières
+                const matieresResponse = await fetch(`${API_URL}/matieres`);
+                const toutesMatieres = await matieresResponse.json();
+                
+                // 2. Récupérer les évaluations de cet enseignant
+                const evalResponse = await fetch(`${API_URL}/evaluations?matricule_ens=${matricule}`);
+                const evaluations = await evalResponse.json();
+                
+                // 3. Déduire les matières enseignées (celles où il y a des évaluations)
+                const matieresEnseignees = [];
+                const matieresMap = {};
+                
+                evaluations.forEach(eval => {
+                    if (!matieresMap[eval.code_mat]) {
+                        const matiere = toutesMatieres.find(m => m.code_mat === eval.code_mat);
+                        if (matiere) {
+                            matieresMap[eval.code_mat] = {
+                                ...matiere,
+                                nb_evaluations: 0,
+                                nb_etudiants: new Set()
+                            };
+                        }
+                    }
+                    if (matieresMap[eval.code_mat]) {
+                        matieresMap[eval.code_mat].nb_evaluations++;
+                        matieresMap[eval.code_mat].nb_etudiants.add(eval.num_ins);
+                    }
+                });
+                
+                // Convertir l'objet en tableau
+                Object.keys(matieresMap).forEach(codeMat => {
+                    const m = matieresMap[codeMat];
+                    matieresEnseignees.push({
+                        code_mat: m.code_mat,
+                        libelle_mat: m.libelle_mat,
+                        nb_credit: m.nb_credit || 4,
+                        libelle_cl: m.code_cl, // Vous devriez récupérer le libellé de la classe
+                        nb_etudiants: m.nb_etudiants.size,
+                        nb_evaluations: m.nb_evaluations
+                    });
+                });
+                
+                // Afficher les enseignements
+                displayEnseignements(matieresEnseignees);
+                
+                // Mettre à jour les statistiques
+                document.getElementById('total-enseignements').textContent = matieresEnseignees.length;
+                
+            } catch (error) {
+                console.error('Erreur chargement enseignements:', error);
+                // Version de secours avec données simulées
+                displayEnseignementsSimules();
+            }
+        }
+
+        // Afficher les enseignements
+        function displayEnseignements(enseignements) {
+            const container = document.getElementById('enseignements-container');
+            
+            if (enseignements.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-6 sm:py-8 text-gray-500">
+                        <i class="fas fa-inbox text-xl sm:text-2xl md:text-3xl mb-2 sm:mb-3"></i>
+                        <p class="text-sm sm:text-base">Aucun enseignement assigné</p>
+                        <p class="text-xs sm:text-sm mt-1">Contactez l'administration pour vous attribuer des matières</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = enseignements.slice(0, 6).map(ens => `
+                <div class="bg-gradient-to-br from-gray-50 to-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-all hover:scale-[1.01] active:scale-95">
+                    <div class="flex items-start justify-between mb-3 sm:mb-4">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-book text-white text-sm sm:text-base"></i>
+                        </div>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs sm:text-sm font-medium">
+                            ${ens.nb_credit} crédits
+                        </span>
+                    </div>
+                    
+                    <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-2 overflow-wrap-break">${ens.libelle_mat}</h3>
+                    <div class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
+                        <div class="flex items-center gap-2 mb-1">
+                            <i class="fas fa-graduation-cap text-gray-400 text-xs sm:text-sm"></i>
+                            <span class="overflow-wrap-break">${ens.libelle_cl || 'Classe non spécifiée'}</span>
+                        </div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <i class="fas fa-users text-gray-400 text-xs sm:text-sm"></i>
+                            <span>${ens.nb_etudiants} étudiants</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-chart-line text-gray-400 text-xs sm:text-sm"></i>
+                            <span>${ens.nb_evaluations} évaluations</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col xs:flex-row gap-2">
+                        <a href="evaluations.html?matiere=${ens.code_mat}" class="flex-1 bg-primary text-white py-2 px-3 sm:py-2 sm:px-4 rounded-lg text-center hover:bg-primary-dark transition font-medium text-sm sm:text-base">
+                            <i class="fas fa-chart-line mr-1"></i> Évaluer
+                        </a>
+                        <a href="#" onclick="showDetails('${ens.code_mat}')" class="flex-1 bg-gray-100 text-gray-700 py-2 px-3 sm:py-2 sm:px-4 rounded-lg text-center hover:bg-gray-200 transition font-medium text-sm sm:text-base">
+                            <i class="fas fa-info-circle mr-1"></i> Détails
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Version de secours avec données simulées
+        function displayEnseignementsSimules() {
+            const enseignements = [
+                { code_mat: 'ALGO_L1', libelle_mat: 'Algorithmique et Programmation', libelle_cl: 'L1 GI', nb_credit: 6, nb_etudiants: 35, nb_evaluations: 12 },
+                { code_mat: 'WEB1_L1', libelle_mat: 'Technologies Web 1', libelle_cl: 'L1 GI', nb_credit: 5, nb_etudiants: 32, nb_evaluations: 8 },
+                { code_mat: 'POO_L2', libelle_mat: 'Programmation Orientée Objet', libelle_cl: 'L2 GI', nb_credit: 6, nb_etudiants: 28, nb_evaluations: 10 }
+            ];
+            
+            displayEnseignements(enseignements);
+            document.getElementById('total-enseignements').textContent = enseignements.length;
+        }
+
+        // Charger les statistiques
+        async function loadStatistics(matricule) {
+            try {
+                // 1. Charger toutes les évaluations de cet enseignant
+                const evalResponse = await fetch(`${API_URL}/evaluations?matricule_ens=${matricule}`);
+                const evaluations = await evalResponse.json();
+                
+                // 2. Compter les étudiants uniques
+                const etudiantsUniques = new Set();
+                evaluations.forEach(eval => {
+                    etudiantsUniques.add(eval.num_ins);
+                });
+                
+                // 3. Charger les périodes
+                const periodesResponse = await fetch(`${API_URL}/periodes`);
+                const periodes = await periodesResponse.json();
+                
+                // 4. Calculer les périodes actives
+                const today = new Date();
+                const activePeriodes = periodes.filter(p => {
+                    const debut = new Date(p.debut_per);
+                    const fin = new Date(p.fin_per);
+                    return today >= debut && today <= fin;
+                }).length;
+                
+                // 5. Mettre à jour les statistiques
+                document.getElementById('total-evaluations').textContent = evaluations.length;
+                document.getElementById('total-etudiants').textContent = etudiantsUniques.size;
+                document.getElementById('active-periodes').textContent = activePeriodes;
+                
+                // 6. Afficher les évaluations récentes
+                displayRecentEvaluations(evaluations.slice(0, 5));
+                
+            } catch (error) {
+                console.error('Erreur chargement statistiques:', error);
+                // Version de secours
+                document.getElementById('total-evaluations').textContent = '0';
+                document.getElementById('total-etudiants').textContent = '0';
+                document.getElementById('active-periodes').textContent = '0';
+                displayRecentEvaluations([]);
+            }
+        }
+
+        // Afficher les évaluations récentes
+        function displayRecentEvaluations(evaluations) {
+            const container = document.getElementById('recent-evaluations');
+            
+            if (evaluations.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-6 sm:py-8 text-gray-500">
+                        <i class="fas fa-inbox text-xl sm:text-2xl md:text-3xl mb-2 sm:mb-3"></i>
+                        <p class="text-sm sm:text-base">Aucune évaluation récente</p>
+                        <p class="text-xs sm:text-sm mt-1">Commencez à noter vos étudiants</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = evaluations.map(eval => {
+                const noteColor = getNoteColor(eval.note);
+                return `
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition gap-2 sm:gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-${noteColor}-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-${noteColor}-600 font-bold text-sm sm:text-base">${eval.note}</span>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="font-medium text-gray-800 text-sm sm:text-base overflow-wrap-break">${eval.libelle_mat || 'Matière'}</div>
+                                <div class="text-xs sm:text-sm text-gray-500 overflow-wrap-break">${eval.nom_et || 'Étudiant'} ${eval.prenom_et || ''} - ${eval.type_eval || 'Évaluation'}</div>
+                            </div>
+                        </div>
+                        <div class="text-left sm:text-right mt-1 sm:mt-0">
+                            <div class="text-xs sm:text-sm text-gray-500">${formatDate(eval.date_eval)}</div>
+                            <div class="text-xs text-gray-400 overflow-wrap-break">${eval.libelle_cl || 'Classe'}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Formatage de date
+        function formatDate(dateString) {
+            if (!dateString) return 'Date inconnue';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+
+        // Obtenir la couleur selon la note
+        function getNoteColor(note) {
+            if (note >= 16) return 'green';
+            if (note >= 14) return 'blue';
+            if (note >= 12) return 'yellow';
+            if (note >= 10) return 'orange';
+            return 'red';
+        }
+
+        // Afficher les détails
+        function showDetails(codeMat) {
+            alert(`Détails pour la matière ${codeMat} à implémenter`);
+        }
+
+        // Afficher les statistiques
+        function showStats() {
+            alert('Statistiques détaillées à implémenter');
+        }
+
+        // Initialisation au chargement de la page
+        document.addEventListener('DOMContentLoaded', loadEnseignantInfo);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>📝 Saisie des Inscriptions - Administration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4361ee',
+                        secondary: '#7209b7',
+                        accent: '#f72585'
+                    },
+                    screens: {
+                        'xs': '375px',
+                        '3xl': '1920px',
+                        '4xl': '2560px'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Variables CSS pour un contrôle précis */
+        :root {
+            --safe-area-top: env(safe-area-inset-top, 0px);
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-area-left: env(safe-area-inset-left, 0px);
+            --safe-area-right: env(safe-area-inset-right, 0px);
+        }
+
+        /* Optimisation pour mobile */
+        @media (max-width: 640px) {
+            html {
+                font-size: 14px;
+            }
+        }
+
+        /* Pour les très petits écrans */
+        @media (max-width: 360px) {
+            html {
+                font-size: 13px;
+            }
+        }
+
+        /* Pour les grands écrans */
+        @media (min-width: 1920px) {
+            html {
+                font-size: 18px;
+            }
+        }
+
+        /* Améliorations de l'expérience tactile */
+        button, 
+        a, 
+        input, 
+        select, 
+        textarea {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Optimisation des animations pour mobile */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Animations pour les modals */
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes modalFadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+        }
+
+        [id^="modal-"] > div {
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        .modal-closing > div {
+            animation: modalFadeOut 0.3s ease-out;
+        }
+
+        /* Optimisation du panel enseignant pour mobile */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(100%);
+            }
+        }
+
+        .panel-slide-in {
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        .panel-slide-out {
+            animation: slideOutRight 0.3s ease-out;
+        }
+
+        /* Amélioration du défilement */
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f1f5f9;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Optimisation des images */
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Support pour les mobiles en orientation paysage */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .min-h-screen {
+                min-height: 100vh;
+            }
+            
+            .panel-landscape {
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+        }
+
+        /* Support pour les encoches et arrondis d'écran */
+        .safe-top {
+            padding-top: var(--safe-area-top);
+        }
+
+        .safe-bottom {
+            padding-bottom: var(--safe-area-bottom);
+        }
+
+        .safe-left {
+            padding-left: var(--safe-area-left);
+        }
+
+        .safe-right {
+            padding-right: var(--safe-area-right);
+        }
+
+        /* Classes utilitaires pour le responsive */
+        .text-responsive {
+            font-size: clamp(0.875rem, 2vw, 1rem);
+        }
+
+        .heading-responsive {
+            font-size: clamp(1.25rem, 4vw, 2.5rem);
+        }
+
+        .gap-responsive {
+            gap: clamp(0.5rem, 2vw, 1.5rem);
+        }
+
+        /* Optimisation pour les écrans tactiles */
+        .touch-target {
+            min-height: 44px;
+            min-width: 44px;
+        }
+
+        /* Masquer la barre de défilement sur mobile */
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Optimisation des transitions */
+        .transition-all-smooth {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen safe-top safe-bottom">
+
+    <!-- Modal Déconnexion -->
+    <div id="modal-deconnexion" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4 safe-top safe-bottom">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4">
+            <div class="p-6">
+                <div class="flex flex-col xs:flex-row items-center gap-3 mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-sign-out-alt text-white text-xl"></i>
+                    </div>
+                    <div class="text-center xs:text-left">
+                        <h3 class="text-xl font-bold text-slate-800">Déconnexion</h3>
+                        <p class="text-slate-600 text-sm mt-1">Êtes-vous sûr de vouloir vous déconnecter ?</p>
+                    </div>
+                </div>
+                <div class="flex flex-col xs:flex-row gap-3 mt-6">
+                    <button onclick="fermerModal('modal-deconnexion')" 
+                        class="touch-target flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-all-smooth">
+                        Annuler
+                    </button>
+                    <button onclick="confirmerDeconnexion()" 
+                        class="touch-target flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-medium hover:shadow-lg transition-all-smooth">
+                        Se déconnecter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Suppression Étudiant -->
+    <div id="modal-suppression" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4 safe-top safe-bottom">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4">
+            <div class="p-6">
+                <div class="flex flex-col xs:flex-row items-center gap-3 mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-trash-alt text-white text-xl"></i>
+                    </div>
+                    <div class="text-center xs:text-left">
+                        <h3 class="text-xl font-bold text-slate-800" id="modal-suppression-titre">Supprimer l'étudiant</h3>
+                        <p class="text-slate-600 text-sm mt-1" id="modal-suppression-message">Cette action est irréversible.</p>
+                    </div>
+                </div>
+                <div class="flex flex-col xs:flex-row gap-3 mt-6">
+                    <button onclick="fermerModal('modal-suppression')" 
+                        class="touch-target flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-all-smooth">
+                        Annuler
+                    </button>
+                    <button onclick="confirmerSuppression()" 
+                        class="touch-target flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-medium hover:shadow-lg transition-all-smooth">
+                        <i class="fas fa-trash mr-2"></i>Supprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel latéral des enseignants - Responsive -->
+    <div id="enseignants-panel" class="fixed inset-y-0 right-0 w-full sm:w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-40 safe-top safe-bottom">
+        <div class="h-full flex flex-col panel-landscape">
+            <!-- En-tête -->
+            <div class="p-4 sm:p-6 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-purple-600 to-purple-700 text-white">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-chalkboard-teacher text-white text-lg sm:text-xl"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-lg sm:text-xl font-bold truncate">Gestion des Enseignants</h3>
+                        <p class="text-xs sm:text-sm opacity-90 truncate">Ajouter/modifier des enseignants</p>
+                    </div>
+                </div>
+                <button onclick="toggleEnseignantsPanel()" class="touch-target p-2 hover:bg-white/20 rounded-lg transition-all-smooth flex-shrink-0">
+                    <i class="fas fa-times text-white"></i>
+                </button>
+            </div>
+            
+            <!-- Contenu -->
+            <div class="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
+                <!-- Bouton d'ajout rapide -->
+                <div class="mb-6">
+                    <button onclick="resetEnseignantForm()" 
+                        class="touch-target w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-medium hover:shadow-lg transition-all-smooth flex items-center justify-center gap-2">
+                        <i class="fas fa-plus-circle"></i>
+                        <span class="truncate">Ajouter un nouvel enseignant</span>
+                    </button>
+                </div>
+                
+                <!-- Liste des enseignants -->
+                <div class="mb-8">
+                    <h4 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-list text-purple-600"></i>
+                        Liste des enseignants
+                    </h4>
+                    <div id="liste-enseignants" class="space-y-3">
+                        <div class="flex items-center justify-center py-8">
+                            <i class="fas fa-spinner fa-spin text-2xl text-purple-500"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Formulaire enseignant -->
+                <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-4 sm:p-6 border border-purple-200">
+                    <h4 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2" id="form-enseignant-title">
+                        <i class="fas fa-user-plus text-purple-600"></i>
+                        <span class="truncate">Ajouter un enseignant</span>
+                    </h4>
+                    
+                    <form id="form-enseignant" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">
+                                    <i class="fas fa-id-card text-purple-600 mr-1"></i>
+                                    Matricule *
+                                </label>
+                                <input type="text" id="matricule-ens" required placeholder="ENS04" 
+                                    class="touch-target w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-500 focus:ring-opacity-20 transition-all-smooth">
+                                <p class="text-xs text-slate-500 mt-1">Doit commencer par "ENS"</p>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">
+                                    <i class="fas fa-user text-purple-600 mr-1"></i>
+                                    Nom *
+                                </label>
+                                <input type="text" id="nom-ens" required placeholder="Nom" 
+                                    class="touch-target w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-500 focus:ring-opacity-20 transition-all-smooth">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">
+                                    <i class="fas fa-user text-purple-600 mr-1"></i>
+                                    Prénom *
+                                </label>
+                                <input type="text" id="prenom-ens" required placeholder="Prénom" 
+                                    class="touch-target w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-500 focus:ring-opacity-20 transition-all-smooth">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">
+                                    <i class="fas fa-envelope text-purple-600 mr-1"></i>
+                                    Email *
+                                </label>
+                                <input type="email" id="email-ens" required placeholder="exemple@iua.ci" 
+                                    class="touch-target w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-500 focus:ring-opacity-20 transition-all-smooth">
+                            </div>
+                        </div>
+                        
+                        <!-- Info mot de passe -->
+                        <div class="mt-4 pt-4 border-t border-slate-200">
+                            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                                <div class="flex items-start gap-3">
+                                    <i class="fas fa-info-circle text-blue-500 mt-1 flex-shrink-0"></i>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm text-blue-800 font-medium">Information mot de passe</p>
+                                        <p class="text-xs text-blue-600 mt-1">
+                                            Le mot de passe sera automatiquement le matricule. Exemple: pour l'enseignant ENS04, 
+                                            le mot de passe sera "ENS04". Le mot de passe est crypté avec bcrypt côté serveur.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Boutons d'action -->
+                        <div class="flex flex-col sm:flex-row gap-3 pt-4">
+                            <button type="button" onclick="resetEnseignantForm()" 
+                                class="touch-target flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition-all-smooth">
+                                <i class="fas fa-redo mr-2"></i>Réinitialiser
+                            </button>
+                            <button type="submit" id="submit-enseignant"
+                                class="touch-target flex-1 px-4 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl font-medium hover:shadow-lg transition-all-smooth">
+                                <i class="fas fa-plus mr-2"></i>Ajouter
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Pied de page -->
+            <div class="p-4 border-t border-slate-200 bg-slate-50 safe-bottom">
+                <p class="text-xs text-slate-500 text-center flex items-center justify-center gap-1 flex-wrap">
+                    <i class="fas fa-shield-alt text-purple-500"></i>
+                    <span>Sécurité: Mots de passe cryptés avec bcrypt</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay pour le panel -->
+    <div id="panel-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-30 safe-top safe-bottom" onclick="toggleEnseignantsPanel()"></div>
+
+    <!-- Navbar Responsive -->
+    <nav class="bg-white shadow-lg sticky top-0 z-40 border-b-4 border-primary safe-top">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 gap-4">
+                <!-- Logo -->
+                <a href="" class="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-all-smooth min-w-0">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-graduation-cap text-white text-lg sm:text-xl"></i>
+                    </div>
+                    <span class="text-lg sm:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent truncate">
+                        GestNotes Admin
+                    </span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center gap-2 flex-shrink-0">
+                    <a href="inscriptions.html" class="touch-target px-4 py-2 rounded-lg bg-primary text-white font-medium flex items-center gap-2">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Inscriptions</span>
+                    </a>
+                    <button onclick="toggleEnseignantsPanel()" id="btn-enseignants" 
+                        class="touch-target px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white font-medium flex items-center gap-2 hover:shadow-lg transition-all-smooth">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span>Enseignants</span>
+                    </button>
+                </div>
+
+                <!-- User Info & Mobile Menu Button -->
+                <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                    <!-- User Profile -->
+                    <div class="flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-lg">
+                        <div class="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user-shield text-white text-xs sm:text-sm"></i>
+                        </div>
+                        <span id="navbar-username" class="hidden sm:block text-sm font-medium text-slate-700 truncate">Admin</span>
+                    </div>
+
+                    <!-- Déconnexion bouton desktop -->
+                    <button onclick="ouvrirModalDeconnexion()" class="hidden md:flex items-center gap-2 touch-target px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all-smooth">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Déconnexion</span>
+                    </button>
+
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-btn" class="md:hidden touch-target p-2 text-slate-600 hover:text-primary transition-all-smooth">
+                        <i class="fas fa-bars text-xl sm:text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-200">
+            <div class="px-4 py-3 space-y-2">
+                <a href="inscriptions.html" class="block touch-target px-4 py-3 rounded-lg bg-primary text-white font-medium">
+                    <i class="fas fa-user-plus mr-2"></i> Inscriptions
+                </a>
+                <button onclick="toggleEnseignantsPanel()" class="block w-full text-left touch-target px-4 py-3 rounded-lg hover:bg-purple-50 text-purple-600 font-medium transition-all-smooth">
+                    <i class="fas fa-chalkboard-teacher mr-2"></i> Gestion Enseignants
+                </button>
+                <button onclick="ouvrirModalDeconnexion()" class="block w-full text-left touch-target px-4 py-3 rounded-lg hover:bg-red-50 text-red-600 font-medium transition-all-smooth">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Déconnexion
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Responsive -->
+    <div class="bg-gradient-to-r from-orange-600 to-red-600 text-white py-8 sm:py-12 px-4 sm:px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-8">
+                <div class="min-w-0">
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 flex items-center gap-2 sm:gap-3">
+                        <i class="fas fa-user-plus"></i>
+                        <span class="truncate">Saisie des Inscriptions</span>
+                    </h1>
+                    <p class="text-sm sm:text-lg opacity-90 truncate">Gestion des inscriptions et réinscriptions étudiants</p>
+                </div>
+                <div class="bg-white bg-opacity-20 backdrop-blur-lg rounded-xl px-4 py-3 sm:px-6 sm:py-4 w-full sm:w-auto">
+                    <p class="text-xs sm:text-sm opacity-90">Année Académique</p>
+                    <p class="text-xl sm:text-2xl font-bold">2025-2026</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+
+        <!-- Formulaire d'inscription -->
+        <div class="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2 sm:gap-3">
+                    <i class="fas fa-edit text-primary"></i>
+                    <span id="form-title" class="truncate">Nouvelle Inscription</span>
+                </h2>
+                <button onclick="reinitialiserFormulaire()"
+                    class="touch-target w-full sm:w-auto px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-all-smooth">
+                    <i class="fas fa-redo mr-2"></i>Réinitialiser
+                </button>
+            </div>
+
+            <form id="form-inscription" class="grid grid-cols-1 gap-4 sm:gap-6">
+                <!-- Classe -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        <i class="fas fa-layer-group text-primary mr-2"></i>
+                        Classe <span class="text-red-500">*</span>
+                    </label>
+                    <select id="classe" required
+                        class="touch-target w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary focus:ring-opacity-20 transition-all-smooth text-sm sm:text-base">
+                        <option value="">-- Sélectionner une classe --</option>
+                        <optgroup label="🎓 Génie Informatique">
+                            <option value="L1GI">Licence 1 Génie Informatique</option>
+                            <option value="L2GI">Licence 2 Génie Informatique</option>
+                            <option value="L3GI">Licence 3 Génie Informatique</option>
+                        </optgroup>
+                        <optgroup label="💼 MIAGE">
+                            <option value="L1MIAGE">Licence 1 MIAGE</option>
+                            <option value="L2MIAGE">Licence 2 MIAGE</option>
+                            <option value="L3MIAGE">Licence 3 MIAGE</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <!-- Matricule avec recherche -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        <i class="fas fa-id-card text-primary mr-2"></i>
+                        Matricule <span class="text-red-500">*</span>
+                    </label>
+                    <div class="flex gap-2">
+                        <input type="text" id="matricule" placeholder="Ex: ETU2026001" required
+                            class="touch-target flex-1 px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary focus:ring-opacity-20 transition-all-smooth uppercase text-sm sm:text-base">
+                        <button type="button" onclick="rechercherEtudiant()"
+                            class="touch-target px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all-smooth flex items-center gap-2 flex-shrink-0"
+                            title="Rechercher l'étudiant">
+                            <i class="fas fa-search"></i>
+                            <span class="hidden sm:inline">Rechercher</span>
+                        </button>
+                    </div>
+                    <p id="search-result" class="text-xs sm:text-sm mt-2"></p>
+                </div>
+
+                <!-- Nom -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        <i class="fas fa-user text-primary mr-2"></i>
+                        Nom <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="nom" placeholder="Nom de famille" required
+                        class="touch-target w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary focus:ring-opacity-20 transition-all-smooth text-sm sm:text-base">
+                </div>
+
+                <!-- Prénom -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        <i class="fas fa-user text-primary mr-2"></i>
+                        Prénom <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="prenom" placeholder="Prénom(s)" required
+                        class="touch-target w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary focus:ring-opacity-20 transition-all-smooth text-sm sm:text-base">
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        <i class="fas fa-envelope text-primary mr-2"></i>
+                        Email <span class="text-red-500">*</span>
+                    </label>
+                    <input type="email" id="email" placeholder="exemple@iua.ci" required
+                        class="touch-target w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary focus:ring-opacity-20 transition-all-smooth text-sm sm:text-base">
+                </div>
+
+                <!-- Photo -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        <i class="fas fa-camera text-primary mr-2"></i>
+                        Photo
+                    </label>
+                    <div class="flex flex-col sm:flex-row gap-4 items-start">
+                        <div id="photo-preview"
+                            class="w-20 h-20 sm:w-24 sm:h-24 bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
+                            <i class="fas fa-user text-3xl sm:text-4xl text-slate-400"></i>
+                        </div>
+                        <div class="flex-1 w-full">
+                            <input type="file" id="photo" accept="image/*" onchange="previewPhoto(event)"
+                                class="touch-target block w-full text-xs sm:text-sm text-slate-500 file:mr-2 sm:file:mr-4 file:py-2 file:px-3 sm:file:px-4 file:rounded-lg file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-blue-600 cursor-pointer">
+                            <p class="text-xs text-slate-500 mt-1">JPG, PNG ou GIF (Max 800KB)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Boutons -->
+                <div class="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t-2 border-slate-100">
+                    <button type="button" onclick="reinitialiserFormulaire()"
+                        class="touch-target w-full sm:w-auto px-4 sm:px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-all-smooth">
+                        <i class="fas fa-times mr-2"></i>Quitter
+                    </button>
+                    <button type="submit"
+                        class="touch-target w-full sm:w-auto px-4 sm:px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-bold hover:shadow-xl transition-all-smooth transform hover:scale-105">
+                        <i class="fas fa-check mr-2"></i>Valider
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tableau des étudiants inscrits -->
+        <div class="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl overflow-hidden">
+            <div class="p-4 sm:p-6 border-b-2 border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2 sm:gap-3">
+                    <i class="fas fa-users text-primary"></i>
+                    <span class="truncate">Liste des Étudiants Inscrits</span>
+                </h2>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <input type="text" id="search-table" placeholder="Rechercher..." onkeyup="filtrerTableau()"
+                        class="touch-target flex-1 sm:w-auto px-4 py-2 border-2 border-slate-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary focus:ring-opacity-20 transition-all-smooth text-sm sm:text-base">
+                    <button onclick="chargerEtudiants()"
+                        class="touch-target px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-all-smooth flex-shrink-0"
+                        title="Rafraîchir">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full min-w-[600px]">
+                    <thead class="bg-gradient-to-r from-orange-500 to-red-500 text-white">
+                        <tr>
+                            <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-bold uppercase tracking-wider">
+                                <i class="fas fa-id-card mr-2"></i>Matricule
+                            </th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-bold uppercase tracking-wider">
+                                <i class="fas fa-user mr-2"></i>Nom
+                            </th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-bold uppercase tracking-wider">
+                                <i class="fas fa-user mr-2"></i>Prénom
+                            </th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-bold uppercase tracking-wider">
+                                <i class="fas fa-envelope mr-2"></i>Email
+                            </th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-bold uppercase tracking-wider">
+                                <i class="fas fa-layer-group mr-2"></i>Classe
+                            </th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-bold uppercase tracking-wider">
+                                <i class="fas fa-image mr-2"></i>Photo
+                            </th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-bold uppercase tracking-wider">
+                                <i class="fas fa-cog mr-2"></i>Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableau-etudiants" class="divide-y divide-slate-200">
+                        <tr>
+                            <td colspan="7" class="px-4 sm:px-6 py-12 sm:py-16 text-center">
+                                <i class="fas fa-spinner fa-spin text-3xl sm:text-4xl text-primary mb-3 sm:mb-4"></i>
+                                <p class="text-slate-600 text-sm sm:text-base">Chargement des étudiants...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination pour mobile -->
+            <div class="p-4 border-t border-slate-200 bg-slate-50 sm:hidden">
+                <div class="flex justify-center items-center gap-2">
+                    <button class="touch-target px-3 py-1 bg-slate-200 rounded text-sm">Précédent</button>
+                    <span class="px-3 py-1 bg-primary text-white rounded text-sm">1</span>
+                    <button class="touch-target px-3 py-1 bg-slate-200 rounded text-sm">Suivant</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Info responsive -->
+        <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl sm:hidden">
+            <div class="flex items-start gap-3">
+                <i class="fas fa-info-circle text-blue-500 mt-1 flex-shrink-0"></i>
+                <div class="flex-1">
+                    <p class="text-sm text-blue-800 font-medium">Mode mobile activé</p>
+                    <p class="text-xs text-blue-600 mt-1">
+                        Faites défiler horizontalement pour voir toutes les colonnes du tableau.
+                        Pour une meilleure expérience, utilisez un écran plus large.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/inscriptions.js"></script>
+    <script>
+        // Variables globales pour la suppression
+        let matriculeASupprimer = null;
+        let etudiantASupprimer = null;
+        let isEnseignantsPanelOpen = false;
+        let enseignantEnCoursEdition = null;
+
+        // ==================== GESTION DU PANEL ENSEIGNANTS ====================
+        function toggleEnseignantsPanel() {
+            const panel = document.getElementById('enseignants-panel');
+            const overlay = document.getElementById('panel-overlay');
+            const btnEnseignants = document.getElementById('btn-enseignants');
+            
+            isEnseignantsPanelOpen = !isEnseignantsPanelOpen;
+            
+            if (isEnseignantsPanelOpen) {
+                panel.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+                panel.classList.add('panel-slide-in');
+                btnEnseignants?.classList.add('shadow-lg', 'scale-105');
+                
+                // Charger la liste des enseignants
+                chargerEnseignants();
+                
+                // Bloquer le défilement du body
+                document.body.style.overflow = 'hidden';
+            } else {
+                panel.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+                panel.classList.remove('panel-slide-in');
+                btnEnseignants?.classList.remove('shadow-lg', 'scale-105');
+                resetEnseignantForm();
+                
+                // Restaurer le défilement du body
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function resetEnseignantForm() {
+            document.getElementById('form-enseignant').reset();
+            document.getElementById('form-enseignant-title').innerHTML = `
+                <i class="fas fa-user-plus text-purple-600"></i>
+                <span class="truncate">Ajouter un enseignant</span>
+            `;
+            document.getElementById('submit-enseignant').innerHTML = `
+                <i class="fas fa-plus mr-2"></i>Ajouter
+            `;
+            enseignantEnCoursEdition = null;
+            
+            // Réinitialiser l'événement submit
+            const form = document.getElementById('form-enseignant');
+            form.onsubmit = (e) => {
+                e.preventDefault();
+                if (enseignantEnCoursEdition) {
+                    mettreAJourEnseignant();
+                } else {
+                    ajouterEnseignant();
+                }
+            };
+        }
+
+        // ==================== GESTION DES ENSEIGNANTS ====================
+        async function chargerEnseignants() {
+            try {
+                const response = await fetch('http://localhost:5000/api/enseignants');
+                if (response.ok) {
+                    const enseignants = await response.json();
+                    afficherEnseignants(enseignants);
+                } else {
+                    throw new Error('Erreur de chargement');
+                }
+            } catch (error) {
+                console.error('Erreur chargement enseignants:', error);
+                document.getElementById('liste-enseignants').innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-exclamation-triangle text-3xl text-red-400 mb-3"></i>
+                        <p class="text-red-600">Erreur de chargement</p>
+                        <button onclick="chargerEnseignants()" class="mt-2 px-3 py-1 bg-red-100 text-red-600 rounded text-sm">
+                            Réessayer
+                        </button>
+                    </div>`;
+            }
+        }
+
+        function afficherEnseignants(enseignants) {
+            const container = document.getElementById('liste-enseignants');
+            
+            if (!enseignants || enseignants.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-chalkboard-teacher text-4xl text-slate-300 mb-3"></i>
+                        <p class="text-slate-600">Aucun enseignant</p>
+                        <p class="text-sm text-slate-500">Ajoutez un premier enseignant</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = enseignants.map(ens => `
+                <div class="group flex items-center justify-between p-3 sm:p-4 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all-smooth">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-purple-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-user-tie text-white text-sm sm:text-base"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <h5 class="font-bold text-slate-800 truncate">${ens.nom_ens} ${ens.prenom_ens}</h5>
+                            <p class="text-xs sm:text-sm text-slate-600 flex items-center gap-2 mt-1">
+                                <span class="px-2 py-0.5 bg-slate-100 rounded text-xs font-medium truncate">${ens.matricule_ens}</span>
+                                <span class="truncate">${ens.email_ens}</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 flex-shrink-0">
+                        <button onclick="editerEnseignant('${ens.matricule_ens}')" 
+                            class="touch-target p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-all-smooth" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="supprimerEnseignant('${ens.matricule_ens}')" 
+                            class="touch-target p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all-smooth" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function ajouterEnseignant() {
+            const matricule = document.getElementById('matricule-ens').value.trim().toUpperCase();
+            const nom = document.getElementById('nom-ens').value.trim();
+            const prenom = document.getElementById('prenom-ens').value.trim();
+            const email = document.getElementById('email-ens').value.trim();
+            
+            // Validation
+            if (!matricule || !nom || !prenom || !email) {
+                afficherNotification('Veuillez remplir tous les champs', 'error');
+                return;
+            }
+            
+            if (!matricule.startsWith('ENS')) {
+                afficherNotification('Le matricule doit commencer par "ENS"', 'error');
+                return;
+            }
+            
+            if (!email.endsWith('@iua.ci')) {
+                afficherNotification('L\'email doit se terminer par @iua.ci', 'error');
+                return;
+            }
+            
+            try {
+                const enseignantData = {
+                    matricule_ens: matricule,
+                    nom_ens: nom,
+                    prenom_ens: prenom,
+                    email_ens: email,
+                    password_ens: matricule // Le matricule est le mot de passe
+                };
+                
+                const response = await fetch('http://localhost:5000/api/enseignants', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(enseignantData)
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Erreur lors de l\'ajout');
+                }
+                
+                afficherNotification('Enseignant ajouté avec succès!', 'success');
+                resetEnseignantForm();
+                await chargerEnseignants();
+                
+            } catch (error) {
+                console.error('Erreur ajout enseignant:', error);
+                afficherNotification(error.message || 'Erreur lors de l\'ajout', 'error');
+            }
+        }
+
+        async function editerEnseignant(matricule) {
+            try {
+                const response = await fetch(`http://localhost:5000/api/enseignants/${matricule}`);
+                
+                if (!response.ok) {
+                    throw new Error('Enseignant non trouvé');
+                }
+                
+                const enseignant = await response.json();
+                enseignantEnCoursEdition = matricule;
+                
+                // Remplir le formulaire
+                document.getElementById('matricule-ens').value = enseignant.matricule_ens;
+                document.getElementById('nom-ens').value = enseignant.nom_ens;
+                document.getElementById('prenom-ens').value = enseignant.prenom_ens;
+                document.getElementById('email-ens').value = enseignant.email_ens;
+                
+                // Changer le titre et le bouton
+                document.getElementById('form-enseignant-title').innerHTML = `
+                    <i class="fas fa-edit text-purple-600"></i>
+                    <span class="truncate">Modifier l'enseignant</span>
+                `;
+                document.getElementById('submit-enseignant').innerHTML = `
+                    <i class="fas fa-save mr-2"></i>Mettre à jour
+                `;
+                
+                // Faire défiler vers le formulaire
+                document.getElementById('form-enseignant').scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                console.error('Erreur édition enseignant:', error);
+                afficherNotification(error.message, 'error');
+            }
+        }
+
+        async function mettreAJourEnseignant() {
+            if (!enseignantEnCoursEdition) return;
+            
+            const matricule = document.getElementById('matricule-ens').value.trim().toUpperCase();
+            const nom = document.getElementById('nom-ens').value.trim();
+            const prenom = document.getElementById('prenom-ens').value.trim();
+            const email = document.getElementById('email-ens').value.trim();
+            
+            try {
+                const updateData = {
+                    matricule_ens: matricule,
+                    nom_ens: nom,
+                    prenom_ens: prenom,
+                    email_ens: email
+                };
+                
+                const response = await fetch(`http://localhost:5000/api/enseignants/${enseignantEnCoursEdition}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updateData)
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Erreur lors de la mise à jour');
+                }
+                
+                afficherNotification('Enseignant mis à jour avec succès!', 'success');
+                resetEnseignantForm();
+                await chargerEnseignants();
+                
+            } catch (error) {
+                console.error('Erreur mise à jour enseignant:', error);
+                afficherNotification(error.message || 'Erreur lors de la mise à jour', 'error');
+            }
+        }
+
+        async function supprimerEnseignant(matricule) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer l'enseignant ${matricule} ?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://localhost:5000/api/enseignants/${matricule}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Erreur lors de la suppression');
+                }
+                
+                afficherNotification('Enseignant supprimé avec succès', 'success');
+                await chargerEnseignants();
+                
+            } catch (error) {
+                console.error('Erreur suppression enseignant:', error);
+                afficherNotification(error.message || 'Erreur lors de la suppression', 'error');
+            }
+        }
+
+        // ==================== FONCTIONS EXISTANTES ====================
+        // Toggle mobile menu
+        document.getElementById('mobile-menu-btn').addEventListener('click', function () {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+            document.body.style.overflow = menu.classList.contains('hidden') ? 'auto' : 'hidden';
+        });
+
+        // Gestion des modals améliorée
+        function ouvrirModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('hidden');
+            modal.classList.remove('modal-closing');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function fermerModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('modal-closing');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('modal-closing');
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Déconnexion
+        function ouvrirModalDeconnexion() {
+            ouvrirModal('modal-deconnexion');
+        }
+
+        function confirmerDeconnexion() {
+            localStorage.removeItem('admin');
+            window.location.href = '../auth-fixed.html';
+        }
+
+        // Suppression étudiant
+        function ouvrirModalSuppression(matricule, nom, prenom) {
+            matriculeASupprimer = matricule;
+            etudiantASupprimer = { nom, prenom };
+            
+            document.getElementById('modal-suppression-titre').textContent = `Supprimer ${nom} ${prenom}`;
+            document.getElementById('modal-suppression-message').textContent = 
+                `Êtes-vous sûr de vouloir supprimer l'étudiant ${matricule} ? Cette action supprimera aussi ses inscriptions et est irréversible.`;
+            
+            ouvrirModal('modal-suppression');
+        }
+
+        function confirmerSuppression() {
+            if (matriculeASupprimer) {
+                supprimerEtudiant(matriculeASupprimer);
+                fermerModal('modal-suppression');
+            }
+        }
+
+        // Initialiser le formulaire enseignant
+        document.getElementById('form-enseignant').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (enseignantEnCoursEdition) {
+                mettreAJourEnseignant();
+            } else {
+                ajouterEnseignant();
+            }
+        });
+
+        // Fermer les modals avec ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                fermerModal('modal-deconnexion');
+                fermerModal('modal-suppression');
+                if (isEnseignantsPanelOpen) {
+                    toggleEnseignantsPanel();
+                }
+                document.getElementById('mobile-menu').classList.add('hidden');
+            }
+        });
+
+        // Clic en dehors pour fermer
+        document.querySelectorAll('[id^="modal-"]').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    fermerModal(this.id);
+                }
+            });
+        });
+
+        // Gestion de l'orientation de l'écran
+        window.addEventListener('orientationchange', function() {
+            // Redimensionner les éléments après changement d'orientation
+            setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+            }, 100);
+        });
+
+        // Optimisation pour les appareils mobiles
+        if ('ontouchstart' in window) {
+            document.body.classList.add('touch-device');
+            
+            // Augmenter l'espacement pour le tactile
+            const buttons = document.querySelectorAll('button, a');
+            buttons.forEach(btn => {
+                btn.classList.add('touch-target');
+            });
+        }
+
+        // Détection de la connexion
+        window.addEventListener('online', () => {
+            afficherNotification('Connexion rétablie', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            afficherNotification('Vous êtes hors ligne', 'error');
+        });
+
+        // Fonction d'affichage de notification
+        function afficherNotification(message, type = 'info') {
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500',
+                warning: 'bg-yellow-500'
+            };
+            
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg text-white ${colors[type]} shadow-lg transform translate-x-full transition-transform duration-300`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 10);
+            
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Exporter les fonctions globales
+        window.toggleEnseignantsPanel = toggleEnseignantsPanel;
+        window.resetEnseignantForm = resetEnseignantForm;
+        window.editerEnseignant = editerEnseignant;
+        window.supprimerEnseignant = supprimerEnseignant;
+        window.afficherNotification = afficherNotification;
+    </script>
+</body>
+</html>

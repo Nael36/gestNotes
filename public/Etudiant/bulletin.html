@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📋 Bulletin - GestNotes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../js/auth-fixed.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4361ee',
+                        secondary: '#7209b7',
+                        accent: '#f72585'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .print-break { page-break-after: always; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50 border-b-4 border-primary no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-white text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                        GestNotes
+                    </span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="index.html" class="px-4 py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2">
+                        <i class="fas fa-home"></i>
+                        <span>Accueil</span>
+                    </a>
+                    <a href="matieres.html" class="px-4 py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2">
+                        <i class="fas fa-book"></i>
+                        <span>Matières</span>
+                    </a>
+                    <a href="notes.html" class="px-4 py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Mes Notes</span>
+                    </a>
+                    <a href="bulletin.html" class="px-4 py-2 rounded-lg bg-primary text-white font-medium flex items-center gap-2">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Bulletin</span>
+                    </a>
+                </div>
+
+                <!-- User Info & Déconnexion -->
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-lg">
+                        <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <span id="navbar-username" class="hidden md:block text-sm font-medium text-slate-700">Chargement...</span>
+                    </div>
+                    <button onclick="auth.logout()" class="flex items-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-medium">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="hidden md:inline">Déconnecter</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-12 px-4 no-print">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <h1 class="text-4xl font-bold mb-2 flex items-center gap-3">
+                        <i class="fas fa-file-alt"></i>
+                        Bulletin Académique
+                    </h1>
+                    <p class="text-lg opacity-90">Consultez et téléchargez votre bulletin de notes</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="window.print()" class="bg-white text-purple-600 px-6 py-3 rounded-xl font-bold hover:shadow-xl transition-all flex items-center gap-2">
+                        <i class="fas fa-print"></i> Imprimer
+                    </button>
+                    <button onclick="downloadBulletin()" class="bg-green-500 text-white px-6 py-3 rounded-xl font-bold hover:shadow-xl transition-all flex items-center gap-2">
+                        <i class="fas fa-download"></i> Télécharger
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Bulletin Container -->
+        <div id="bulletin-container" class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            
+            <!-- En-tête du bulletin -->
+            <div class="bg-gradient-to-r from-primary to-secondary text-white p-8">
+                <div class="text-center">
+                    <h1 class="text-3xl font-bold mb-2">BULLETIN ACADÉMIQUE</h1>
+                    <p class="text-lg opacity-90">Année Académique <span id="annee-academique">2024-2025</span></p>
+                </div>
+            </div>
+
+            <!-- Informations étudiant -->
+            <div class="p-8 border-b border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Informations Étudiant</h3>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Nom:</span>
+                                <span class="font-medium" id="etudiant-nom">Chargement...</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Prénom:</span>
+                                <span class="font-medium" id="etudiant-prenom">Chargement...</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Matricule:</span>
+                                <span class="font-medium" id="etudiant-matricule">Chargement...</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Email:</span>
+                                <span class="font-medium" id="etudiant-email">Chargement...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Informations Académiques</h3>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Classe:</span>
+                                <span class="font-medium" id="etudiant-classe">Chargement...</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Date d'inscription:</span>
+                                <span class="font-medium" id="etudiant-date-inscription">Chargement...</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Statut:</span>
+                                <span class="font-medium" id="etudiant-statut">Chargement...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Résultats par matière -->
+            <div class="p-8 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">Résultats par Matière</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="border border-gray-300 px-4 py-2 text-left font-medium">Matière</th>
+                                <th class="border border-gray-300 px-4 py-2 text-center font-medium">Crédits</th>
+                                <th class="border border-gray-300 px-4 py-2 text-center font-medium">Moyenne</th>
+                                <th class="border border-gray-300 px-4 py-2 text-center font-medium">Nb. Éval</th>
+                                <th class="border border-gray-300 px-4 py-2 text-center font-medium">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matieres-table">
+                            <tr>
+                                <td colspan="5" class="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                                    <i class="fas fa-spinner fa-spin text-2xl mb-3"></i>
+                                    <p>Chargement des résultats...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Statistiques générales -->
+            <div class="p-8 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">Statistiques Générales</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-blue-50 rounded-lg p-4 text-center">
+                        <div class="text-3xl font-bold text-blue-600" id="moyenne-generale">0.00</div>
+                        <div class="text-sm text-gray-600">Moyenne Générale</div>
+                    </div>
+                    <div class="bg-green-50 rounded-lg p-4 text-center">
+                        <div class="text-3xl font-bold text-green-600" id="credits-valides">0</div>
+                        <div class="text-sm text-gray-600">Crédits Validés</div>
+                    </div>
+                    <div class="bg-purple-50 rounded-lg p-4 text-center">
+                        <div class="text-3xl font-bold text-purple-600" id="total-credits">0</div>
+                        <div class="text-sm text-gray-600">Total Crédits</div>
+                    </div>
+                    <div class="bg-orange-50 rounded-lg p-4 text-center">
+                        <div class="text-3xl font-bold text-orange-600" id="total-evaluations">0</div>
+                        <div class="text-sm text-gray-600">Total Évaluations</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Décision -->
+            <div class="p-8">
+                <div class="text-center">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Décision du Jury</h3>
+                    <div id="decision-container" class="inline-block px-8 py-4 rounded-lg text-lg font-bold">
+                        <!-- La décision sera affichée ici -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Détail des évaluations -->
+            <div class="p-8 border-t border-gray-200">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">Détail des Évaluations</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="border border-gray-300 px-4 py-2 text-left font-medium">Matière</th>
+                                <th class="border border-gray-300 px-4 py-2 text-center font-medium">Type</th>
+                                <th class="border border-gray-300 px-4 py-2 text-center font-medium">Note</th>
+                                <th class="border border-gray-300 px-4 py-2 text-center font-medium">Coef</th>
+                                <th class="border border-gray-300 px-4 py-2 text-center font-medium">Date</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left font-medium">Enseignant</th>
+                            </tr>
+                        </thead>
+                        <tbody id="evaluations-detail">
+                            <tr>
+                                <td colspan="6" class="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                                    <i class="fas fa-spinner fa-spin text-2xl mb-3"></i>
+                                    <p>Chargement des évaluations...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let bulletinData = null;
+
+            // Vérifier l'authentification
+            if (!window.auth || !window.auth.isAuthenticated()) {
+                window.location.href = '../auth-fixed.html';
+                return;
+            }
+
+            // Initialiser
+            initBulletin();
+
+            async function initBulletin() {
+                try {
+                    const user = window.auth.user;
+                    
+                    // Mettre à jour le nom dans la navbar
+                    document.getElementById('navbar-username').textContent = `${user.nom} ${user.prenom}`;
+                    
+                    // Charger le bulletin
+                    await loadBulletin(user.id);
+                    
+                    // Configurer les événements
+                    setupEventListeners();
+                    
+                } catch (error) {
+                    console.error('Erreur d\'initialisation:', error);
+                    showError('Erreur lors du chargement du bulletin');
+                }
+            }
+
+            async function loadBulletin(userId) {
+                try {
+                    showLoadingState(true);
+                    
+                    // Simuler une requête API (à adapter avec votre backend)
+                    // const response = await window.auth.authenticatedFetch(`/api/etudiants/${userId}/bulletin`);
+                    // bulletinData = await response.json();
+                    
+                    // Données de démonstration
+                    bulletinData = getDemoBulletinData();
+                    
+                    // Remplir les informations
+                    fillBulletinInfo();
+                    
+                    showLoadingState(false);
+                    
+                } catch (error) {
+                    console.error('Erreur chargement bulletin:', error);
+                    showError('Impossible de charger le bulletin');
+                    throw error;
+                }
+            }
+
+            function fillBulletinInfo() {
+                if (!bulletinData) return;
+
+                const { etudiant, annee_academique, moyennes_matieres, statistiques_generales, evaluations } = bulletinData;
+
+                // Informations étudiant
+                document.getElementById('etudiant-nom').textContent = etudiant.nom_et;
+                document.getElementById('etudiant-prenom').textContent = etudiant.prenom_et;
+                document.getElementById('etudiant-matricule').textContent = etudiant.matricule_et;
+                document.getElementById('etudiant-email').textContent = etudiant.email_et;
+                document.getElementById('etudiant-classe').textContent = etudiant.libelle_cl;
+                document.getElementById('etudiant-date-inscription').textContent = formatDate(etudiant.date_ins);
+                document.getElementById('etudiant-statut').textContent = etudiant.statut_inscription;
+                document.getElementById('annee-academique').textContent = annee_academique;
+
+                // Tableau des matières
+                fillMatieresTable(moyennes_matieres);
+
+                // Statistiques générales
+                fillStatistics(statistiques_generales);
+
+                // Détail des évaluations
+                fillEvaluationsDetail(evaluations);
+            }
+
+            function fillMatieresTable(moyennes_matieres) {
+                const matieresTable = document.getElementById('matieres-table');
+                
+                if (!moyennes_matieres || moyennes_matieres.length === 0) {
+                    matieresTable.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                                <i class="fas fa-inbox text-2xl mb-3"></i>
+                                <p>Aucune matière évaluée</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                matieresTable.innerHTML = moyennes_matieres.map(mat => `
+                    <tr>
+                        <td class="border border-gray-300 px-4 py-2 font-medium">${mat.libelle_mat}</td>
+                        <td class="border border-gray-300 px-4 py-2 text-center">${mat.nb_credit}</td>
+                        <td class="border border-gray-300 px-4 py-2 text-center font-bold ${getMoyenneColor(mat.moyenne_matiere)}">
+                            ${mat.moyenne_matiere.toFixed(2)}
+                        </td>
+                        <td class="border border-gray-300 px-4 py-2 text-center">${mat.nb_evaluations}</td>
+                        <td class="border border-gray-300 px-4 py-2 text-center">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium ${mat.statut_validation === 'Validé' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${mat.statut_validation}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            function fillStatistics(statistiques) {
+                if (!statistiques) return;
+                
+                document.getElementById('moyenne-generale').textContent = statistiques.moyenne_generale.toFixed(2);
+                document.getElementById('credits-valides').textContent = statistiques.credits_valides;
+                document.getElementById('total-credits').textContent = statistiques.total_credits;
+                document.getElementById('total-evaluations').textContent = statistiques.nb_matieres_evaluees;
+                
+                // Décision du jury
+                const decisionContainer = document.getElementById('decision-container');
+                if (statistiques.statut_admission === 'Admis') {
+                    decisionContainer.className = 'inline-block px-8 py-4 rounded-lg text-lg font-bold bg-green-100 text-green-800';
+                    decisionContainer.textContent = 'ADMIS';
+                } else {
+                    decisionContainer.className = 'inline-block px-8 py-4 rounded-lg text-lg font-bold bg-red-100 text-red-800';
+                    decisionContainer.textContent = 'AJOURNÉ';
+                }
+            }
+
+            function fillEvaluationsDetail(evaluations) {
+                const evalTable = document.getElementById('evaluations-detail');
+                
+                if (!evaluations || evaluations.length === 0) {
+                    evalTable.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                                <i class="fas fa-inbox text-2xl mb-3"></i>
+                                <p>Aucune évaluation</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                evalTable.innerHTML = evaluations.map(eval => `
+                    <tr>
+                        <td class="border border-gray-300 px-4 py-2">${eval.libelle_mat}</td>
+                        <td class="border border-gray-300 px-4 py-2 text-center">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full ${getTypeColor(eval.type_eval)}">
+                                ${eval.type_eval}
+                            </span>
+                        </td>
+                        <td class="border border-gray-300 px-4 py-2 text-center font-bold ${getNoteColor(eval.note)}">
+                            ${eval.note}
+                        </td>
+                        <td class="border border-gray-300 px-4 py-2 text-center">${eval.coefficient}</td>
+                        <td class="border border-gray-300 px-4 py-2 text-center">${formatDate(eval.date_eval)}</td>
+                        <td class="border border-gray-300 px-4 py-2">${eval.nom_ens} ${eval.prenom_ens}</td>
+                    </tr>
+                `).join('');
+            }
+
+            function getNoteColor(note) {
+                if (note >= 16) return 'text-green-600';
+                if (note >= 14) return 'text-blue-600';
+                if (note >= 12) return 'text-yellow-600';
+                if (note >= 10) return 'text-orange-600';
+                return 'text-red-600';
+            }
+
+            function getMoyenneColor(moyenne) {
+                if (moyenne >= 16) return 'text-green-600';
+                if (moyenne >= 14) return 'text-blue-600';
+                if (moyenne >= 12) return 'text-yellow-600';
+                if (moyenne >= 10) return 'text-orange-600';
+                return 'text-red-600';
+            }
+
+            function getTypeColor(type) {
+                const colors = {
+                    'CC': 'bg-blue-100 text-blue-800',
+                    'EXAMEN': 'bg-red-100 text-red-800',
+                    'TP': 'bg-green-100 text-green-800',
+                    'PROJET': 'bg-purple-100 text-purple-800',
+                    'ORAL': 'bg-yellow-100 text-yellow-800'
+                };
+                return colors[type] || 'bg-gray-100 text-gray-800';
+            }
+
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('fr-FR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+
+            function downloadBulletin() {
+                window.print();
+            }
+
+            function setupEventListeners() {
+                // Bouton d'impression
+                const printBtn = document.querySelector('[onclick="window.print()"]');
+                if (printBtn) {
+                    printBtn.onclick = () => window.print();
+                }
+                
+                // Bouton télécharger
+                const downloadBtn = document.querySelector('[onclick="downloadBulletin()"]');
+                if (downloadBtn) {
+                    downloadBtn.onclick = downloadBulletin;
+                }
+            }
+
+            function showLoadingState(show) {
+                const loadingElements = document.querySelectorAll('.fa-spinner');
+                loadingElements.forEach(el => {
+                    el.style.display = show ? 'inline-block' : 'none';
+                });
+            }
+
+            function showError(message) {
+                alert(message); // À remplacer par une notification plus élégante
+            }
+
+            // Données de démonstration
+            function getDemoBulletinData() {
+                return {
+                    etudiant: {
+                        nom_et: "Dupont",
+                        prenom_et: "Jean",
+                        matricule_et: "ET2024001",
+                        email_et: "jean.dupont@email.com",
+                        libelle_cl: "Licence 3 Informatique",
+                        date_ins: "2024-09-01",
+                        statut_inscription: "Inscrit"
+                    },
+                    annee_academique: "2024-2025",
+                    moyennes_matieres: [
+                        {
+                            libelle_mat: "Algorithmique Avancée",
+                            nb_credit: 5,
+                            moyenne_matiere: 15.5,
+                            nb_evaluations: 3,
+                            statut_validation: "Validé"
+                        },
+                        {
+                            libelle_mat: "Base de Données",
+                            nb_credit: 4,
+                            moyenne_matiere: 12.75,
+                            nb_evaluations: 2,
+                            statut_validation: "Validé"
+                        },
+                        {
+                            libelle_mat: "Réseaux Informatiques",
+                            nb_credit: 6,
+                            moyenne_matiere: 9.5,
+                            nb_evaluations: 4,
+                            statut_validation: "Non validé"
+                        },
+                        {
+                            libelle_mat: "Développement Web",
+                            nb_credit: 5,
+                            moyenne_matiere: 17.25,
+                            nb_evaluations: 3,
+                            statut_validation: "Validé"
+                        }
+                    ],
+                    statistiques_generales: {
+                        moyenne_generale: 13.75,
+                        credits_valides: 14,
+                        total_credits: 20,
+                        nb_matieres_evaluees: 4,
+                        statut_admission: "Admis"
+                    },
+                    evaluations: [
+                        {
+                            libelle_mat: "Algorithmique Avancée",
+                            type_eval: "CC",
+                            note: 16,
+                            coefficient: 1,
+                            date_eval: "2024-10-15",
+                            nom_ens: "Martin",
+                            prenom_ens: "Sophie"
+                        },
+                        {
+                            libelle_mat: "Algorithmique Avancée",
+                            type_eval: "EXAMEN",
+                            note: 15,
+                            coefficient: 2,
+                            date_eval: "2024-12-10",
+                            nom_ens: "Martin",
+                            prenom_ens: "Sophie"
+                        },
+                        {
+                            libelle_mat: "Base de Données",
+                            type_eval: "TP",
+                            note: 14,
+                            coefficient: 1,
+                            date_eval: "2024-11-05",
+                            nom_ens: "Dubois",
+                            prenom_ens: "Pierre"
+                        },
+                        {
+                            libelle_mat: "Développement Web",
+                            type_eval: "PROJET",
+                            note: 18,
+                            coefficient: 2,
+                            date_eval: "2024-11-20",
+                            nom_ens: "Leroy",
+                            prenom_ens: "Marie"
+                        }
+                    ]
+                };
+            }
+        });
+    </script>
+</body>
+</html>

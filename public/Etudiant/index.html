@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 GestNotes - Espace Étudiant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../js/auth-simple.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4361ee',
+                        secondary: '#7209b7',
+                        accent: '#f72585'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50 border-b-4 border-primary">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-white text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                        GestNotes
+                    </span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="index.html" class="px-4 py-2 rounded-lg bg-primary text-white font-medium flex items-center gap-2">
+                        <i class="fas fa-home"></i>
+                        <span>Accueil</span>
+                    </a>
+                    <a href="matieres.html" class="px-4 py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2">
+                        <i class="fas fa-book"></i>
+                        <span>Matières</span>
+                    </a>
+                    <a href="notes.html" class="px-4 py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Mes Notes</span>
+                    </a>
+                    <a href="bulletin.html" class="px-4 py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Bulletin</span>
+                    </a>
+                </div>
+
+                <!-- User Info & Déconnexion -->
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-lg">
+                        <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <span id="navbar-username" class="hidden md:block text-sm font-medium text-slate-700">Chargement...</span>
+                    </div>
+                    <button onclick="auth.logout()" class="flex items-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-medium">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="hidden md:inline">Déconnecter</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                    <h1 class="text-4xl font-bold mb-2 flex items-center gap-3">
+                        <i class="fas fa-user-graduate"></i>
+                        Espace Étudiant
+                    </h1>
+                    <p class="text-lg opacity-90">Bienvenue dans votre espace académique</p>
+                </div>
+                <div class="text-center md:text-right">
+                    <div class="text-3xl font-bold" id="student-name">Chargement...</div>
+                    <div class="text-lg opacity-90" id="student-class">Chargement...</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Cartes de statistiques -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-book text-blue-600 text-xl"></i>
+                    </div>
+                    <span class="text-sm text-gray-500">Total</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-800" id="total-matieres">0</div>
+                <div class="text-sm text-gray-600">Matières</div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-chart-line text-green-600 text-xl"></i>
+                    </div>
+                    <span class="text-sm text-gray-500">Actuelle</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-800" id="moyenne-generale">0.00</div>
+                <div class="text-sm text-gray-600">Moyenne</div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-award text-purple-600 text-xl"></i>
+                    </div>
+                    <span class="text-sm text-gray-500">Validés</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-800" id="credits-valides">0</div>
+                <div class="text-sm text-gray-600">Crédits</div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-tasks text-orange-600 text-xl"></i>
+                    </div>
+                    <span class="text-sm text-gray-500">Évaluations</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-800" id="total-evaluations">0</div>
+                <div class="text-sm text-gray-600">Total</div>
+            </div>
+        </div>
+
+        <!-- Dernières notes -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <i class="fas fa-chart-line text-primary"></i>
+                    Mes Dernières Notes
+                </h2>
+                <a href="notes.html" class="text-primary hover:underline font-medium">Voir tout →</a>
+            </div>
+            <div id="recent-notes" class="space-y-4">
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
+                    <p>Chargement des notes...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <a href="matieres.html" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl p-6 hover:shadow-xl transition-all transform hover:scale-105">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-book text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold">Mes Matières</h3>
+                        <p class="text-sm opacity-90">Consulter mes matières</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="notes.html" class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl p-6 hover:shadow-xl transition-all transform hover:scale-105">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold">Mes Notes</h3>
+                        <p class="text-sm opacity-90">Voir mes évaluations</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="bulletin.html" class="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-2xl p-6 hover:shadow-xl transition-all transform hover:scale-105">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-file-alt text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold">Bulletin</h3>
+                        <p class="text-sm opacity-90">Télécharger mon bulletin</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Vérifier l'authentification
+            if (!window.auth || !window.auth.isAuthenticated()) {
+                window.location.href = '../auth-fixed.html';
+                return;
+            }
+
+            // Initialiser
+            initDashboard();
+
+            async function initDashboard() {
+                try {
+                    const user = window.auth.user;
+                    
+                    // Mettre à jour les informations utilisateur
+                    updateUserInfo(user);
+                    
+                    // Charger les données de l'étudiant
+                    await loadStudentData(user.id);
+                    
+                } catch (error) {
+                    console.error('Erreur d\'initialisation:', error);
+                    showError('Erreur lors du chargement du tableau de bord');
+                }
+            }
+
+            function updateUserInfo(user) {
+                const username = `${user.nom} ${user.prenom}`;
+                document.getElementById('navbar-username').textContent = username;
+                document.getElementById('student-name').textContent = username;
+                
+                if (user.classe) {
+                    document.getElementById('student-class').textContent = `Classe: ${user.classe}`;
+                }
+            }
+
+            async function loadStudentData(userId) {
+                try {
+                    showLoadingState(true);
+                    
+                    // Simuler les requêtes API
+                    // const studentResponse = await window.auth.authenticatedFetch(`/api/etudiants/${userId}`);
+                    // const studentData = await studentResponse.json();
+                    
+                    // const statsResponse = await window.auth.authenticatedFetch(`/api/etudiants/${userId}/stats`);
+                    // const statsData = await statsResponse.json();
+                    
+                    // Données de démonstration
+                    const studentData = getDemoStudentData(userId);
+                    const statsData = getDemoStatsData();
+                    
+                    // Mettre à jour les informations de classe
+                    if (studentData.classe) {
+                        document.getElementById('student-class').textContent = `Classe: ${studentData.classe}`;
+                    }
+                    
+                    // Mettre à jour les statistiques
+                    updateStatistics(statsData);
+                    
+                    // Charger les notes récentes
+                    await loadRecentNotes(userId);
+                    
+                    showLoadingState(false);
+                    
+                } catch (error) {
+                    console.error('Erreur chargement données étudiant:', error);
+                    showError('Impossible de charger les données');
+                }
+            }
+
+            function updateStatistics(statsData) {
+                document.getElementById('total-matieres').textContent = statsData.total_matieres;
+                document.getElementById('moyenne-generale').textContent = statsData.moyenne_generale.toFixed(2);
+                document.getElementById('credits-valides').textContent = statsData.credits_valides;
+                document.getElementById('total-evaluations').textContent = statsData.total_evaluations;
+            }
+
+            async function loadRecentNotes(userId) {
+                try {
+                    // Simuler une requête API
+                    // const response = await window.auth.authenticatedFetch(`/api/etudiants/${userId}/notes/recent`);
+                    // const notes = await response.json();
+                    
+                    const notes = getDemoRecentNotes();
+                    displayRecentNotes(notes);
+                    
+                } catch (error) {
+                    console.error('Erreur chargement notes récentes:', error);
+                }
+            }
+
+            function displayRecentNotes(notes) {
+                const container = document.getElementById('recent-notes');
+                
+                if (!notes || notes.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-inbox text-3xl mb-3"></i>
+                            <p>Aucune note disponible</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = notes.map(note => `
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 ${getNoteColorClass(note.note)} rounded-lg flex items-center justify-center">
+                                <span class="${getNoteTextColor(note.note)} font-bold">${note.note}</span>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-800">${note.libelle_mat}</div>
+                                <div class="text-sm text-gray-500">${note.type_eval} - ${note.libelle_per}</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-gray-500">${formatDate(note.date_eval)}</div>
+                            <div class="text-xs text-gray-400">Coef: ${note.coefficient}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            function getNoteColorClass(note) {
+                if (note >= 16) return 'bg-green-100';
+                if (note >= 14) return 'bg-blue-100';
+                if (note >= 12) return 'bg-yellow-100';
+                if (note >= 10) return 'bg-orange-100';
+                return 'bg-red-100';
+            }
+
+            function getNoteTextColor(note) {
+                if (note >= 16) return 'text-green-600';
+                if (note >= 14) return 'text-blue-600';
+                if (note >= 12) return 'text-yellow-600';
+                if (note >= 10) return 'text-orange-600';
+                return 'text-red-600';
+            }
+
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('fr-FR');
+            }
+
+            function showLoadingState(show) {
+                const loadingElements = document.querySelectorAll('.fa-spinner');
+                loadingElements.forEach(el => {
+                    el.style.display = show ? 'inline-block' : 'none';
+                });
+            }
+
+            function showError(message) {
+                // Créer une notification d'erreur
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                errorDiv.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                document.body.appendChild(errorDiv);
+                
+                // Supprimer après 5 secondes
+                setTimeout(() => {
+                    errorDiv.remove();
+                }, 5000);
+            }
+
+            // Données de démonstration
+            function getDemoStudentData(userId) {
+                return {
+                    id: userId,
+                    nom: "Dupont",
+                    prenom: "Jean",
+                    classe: "Licence 3 Informatique",
+                    matricule: "ET2024001",
+                    email: "jean.dupont@email.com"
+                };
+            }
+
+            function getDemoStatsData() {
+                return {
+                    total_matieres: 8,
+                    moyenne_generale: 13.75,
+                    credits_valides: 42,
+                    total_evaluations: 24
+                };
+            }
+
+            function getDemoRecentNotes() {
+                return [
+                    {
+                        libelle_mat: "Algorithmique Avancée",
+                        type_eval: "CC",
+                        note: 16,
+                        libelle_per: "Semestre 1",
+                        date_eval: "2024-10-15",
+                        coefficient: 1
+                    },
+                    {
+                        libelle_mat: "Base de Données",
+                        type_eval: "TP",
+                        note: 14,
+                        libelle_per: "Semestre 1",
+                        date_eval: "2024-11-05",
+                        coefficient: 1
+                    },
+                    {
+                        libelle_mat: "Développement Web",
+                        type_eval: "PROJET",
+                        note: 18,
+                        libelle_per: "Semestre 1",
+                        date_eval: "2024-11-20",
+                        coefficient: 2
+                    },
+                    {
+                        libelle_mat: "Réseaux Informatiques",
+                        type_eval: "CC",
+                        note: 11,
+                        libelle_per: "Semestre 1",
+                        date_eval: "2024-10-25",
+                        coefficient: 1
+                    },
+                    {
+                        libelle_mat: "Anglais Technique",
+                        type_eval: "ORAL",
+                        note: 15,
+                        libelle_per: "Semestre 1",
+                        date_eval: "2024-11-15",
+                        coefficient: 1
+                    }
+                ];
+            }
+        });
+    </script>
+</body>
+</html>

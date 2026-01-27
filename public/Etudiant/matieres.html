@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 Mes Matières - GestNotes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../js/auth-fixed.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4361ee',
+                        secondary: '#7209b7',
+                        accent: '#f72585'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50 border-b-4 border-primary">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-white text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                        GestNotes
+                    </span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="index.html" class="px-4 py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2">
+                        <i class="fas fa-home"></i>
+                        <span>Accueil</span>
+                    </a>
+                    <a href="matieres.html" class="px-4 py-2 rounded-lg bg-primary text-white font-medium flex items-center gap-2">
+                        <i class="fas fa-book"></i>
+                        <span>Matières</span>
+                    </a>
+                    <a href="notes.html" class="px-4 py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Mes Notes</span>
+                    </a>
+                    <a href="bulletin.html" class="px-4 py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Bulletin</span>
+                    </a>
+                </div>
+
+                <!-- User Info & Déconnexion -->
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-lg">
+                        <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <span id="navbar-username" class="hidden md:block text-sm font-medium text-slate-700">Chargement...</span>
+                    </div>
+                    <button onclick="auth.logout()" class="flex items-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-medium">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="hidden md:inline">Déconnecter</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <h1 class="text-4xl font-bold mb-2 flex items-center gap-3">
+                        <i class="fas fa-book"></i>
+                        Mes Matières
+                    </h1>
+                    <p class="text-lg opacity-90">Consultez toutes vos matières et enseignants</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold" id="total-matieres">0</div>
+                    <div class="text-sm opacity-90">Matières suivies</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Recherche et filtres -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+            <div class="flex flex-col md:flex-row gap-4 items-center">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Rechercher une matière ou un enseignant</label>
+                    <input type="text" id="search-input" placeholder="Rechercher..." 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div class="flex gap-2">
+                    <select id="filter-credits" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="">Tous les crédits</option>
+                        <option value="3-4">3-4 crédits</option>
+                        <option value="5-6">5-6 crédits</option>
+                        <option value="7+">7+ crédits</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-book text-blue-600 text-xl"></i>
+                    </div>
+                    <span class="text-sm text-gray-500">Total</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-800" id="total-matieres-stat">0</div>
+                <div class="text-sm text-gray-600">Matières</div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-green-600 text-xl"></i>
+                    </div>
+                    <span class="text-sm text-gray-500">Total</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-800" id="total-credits">0</div>
+                <div class="text-sm text-gray-600">Crédits</div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-chalkboard-teacher text-purple-600 text-xl"></i>
+                    </div>
+                    <span class="text-sm text-gray-500">Total</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-800" id="total-enseignants">0</div>
+                <div class="text-sm text-gray-600">Enseignants</div>
+            </div>
+        </div>
+
+        <!-- Liste des matières -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <i class="fas fa-list text-primary"></i>
+                    Liste des Matières
+                </h2>
+            </div>
+            <div class="p-6">
+                <div id="matieres-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="col-span-full text-center py-12 text-gray-500">
+                        <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
+                        <p>Chargement des matières...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let allMatieres = [];
+
+            // Vérifier l'authentification
+            if (!window.auth || !window.auth.isAuthenticated()) {
+                window.location.href = '../auth-fixed.html';
+                return;
+            }
+
+            // Initialiser
+            initMatieres();
+
+            async function initMatieres() {
+                try {
+                    const user = window.auth.user;
+                    
+                    // Mettre à jour le nom dans la navbar
+                    document.getElementById('navbar-username').textContent = `${user.nom} ${user.prenom}`;
+                    
+                    // Charger les matières
+                    await loadMatieres(user.id);
+                    
+                    // Configurer les événements
+                    setupEventListeners();
+                    
+                } catch (error) {
+                    console.error('Erreur d\'initialisation:', error);
+                    showError('Erreur lors du chargement des matières');
+                }
+            }
+
+            async function loadMatieres(userId) {
+                try {
+                    showLoadingState(true);
+                    
+                    // Simuler une requête API
+                    // const response = await window.auth.authenticatedFetch(`/api/etudiants/${userId}/matieres`);
+                    // allMatieres = await response.json();
+                    
+                    // Données de démonstration
+                    allMatieres = getDemoMatieres();
+                    
+                    // Mettre à jour les statistiques
+                    updateStatistics();
+                    
+                    // Afficher les matières
+                    displayMatieres(allMatieres);
+                    
+                    showLoadingState(false);
+                    
+                } catch (error) {
+                    console.error('Erreur chargement des matières:', error);
+                    showError('Impossible de charger les matières');
+                    throw error;
+                }
+            }
+
+            function updateStatistics() {
+                const totalMatieres = allMatieres.length;
+                const totalCredits = allMatieres.reduce((sum, mat) => sum + mat.nb_credit, 0);
+                const totalEnseignants = [...new Set(allMatieres.map(mat => mat.matricule_ens))].length;
+                
+                document.getElementById('total-matieres').textContent = totalMatieres;
+                document.getElementById('total-matieres-stat').textContent = totalMatieres;
+                document.getElementById('total-credits').textContent = totalCredits;
+                document.getElementById('total-enseignants').textContent = totalEnseignants;
+            }
+
+            function displayMatieres(matieres) {
+                const container = document.getElementById('matieres-container');
+                
+                if (!matieres || matieres.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-full text-center py-12 text-gray-500">
+                            <i class="fas fa-inbox text-3xl mb-3"></i>
+                            <p>Aucune matière trouvée</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = matieres.map(mat => `
+                    <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all hover:scale-105">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                                <i class="fas fa-book text-white text-xl"></i>
+                            </div>
+                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                                ${mat.nb_credit} crédits
+                            </span>
+                        </div>
+                        
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">${mat.libelle_mat}</h3>
+                        <div class="text-sm text-gray-600 mb-4">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i class="fas fa-graduation-cap text-gray-400"></i>
+                                <span>${mat.libelle_cl}</span>
+                            </div>
+                            ${mat.nom_ens ? `
+                                <div class="flex items-center gap-2 mb-1">
+                                    <i class="fas fa-chalkboard-teacher text-gray-400"></i>
+                                    <span>${mat.nom_ens} ${mat.prenom_ens}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-envelope text-gray-400"></i>
+                                    <span class="text-xs">${mat.email_ens}</span>
+                                </div>
+                            ` : `
+                                <div class="flex items-center gap-2 text-gray-400">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="text-xs">Aucun enseignant assigné</span>
+                                </div>
+                            `}
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <a href="notes.html?matiere=${encodeURIComponent(mat.libelle_mat)}" 
+                            class="flex-1 bg-primary text-white py-2 px-4 rounded-lg text-center hover:bg-blue-700 transition font-medium">
+                                <i class="fas fa-chart-line mr-1"></i> Notes
+                            </a>
+                            <a href="bulletin.html" 
+                            class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg text-center hover:bg-gray-200 transition font-medium">
+                                <i class="fas fa-file-alt mr-1"></i> Bulletin
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            function filterMatieres() {
+                const searchTerm = document.getElementById('search-input').value.toLowerCase();
+                const creditsFilter = document.getElementById('filter-credits').value;
+                
+                const filtered = allMatieres.filter(mat => {
+                    const matchSearch = !searchTerm || 
+                        mat.libelle_mat.toLowerCase().includes(searchTerm) ||
+                        mat.libelle_cl.toLowerCase().includes(searchTerm) ||
+                        (mat.nom_ens && `${mat.nom_ens} ${mat.prenom_ens}`.toLowerCase().includes(searchTerm));
+                    
+                    let matchCredits = true;
+                    if (creditsFilter) {
+                        if (creditsFilter === '3-4') {
+                            matchCredits = mat.nb_credit >= 3 && mat.nb_credit <= 4;
+                        } else if (creditsFilter === '5-6') {
+                            matchCredits = mat.nb_credit >= 5 && mat.nb_credit <= 6;
+                        } else if (creditsFilter === '7+') {
+                            matchCredits = mat.nb_credit >= 7;
+                        }
+                    }
+                    
+                    return matchSearch && matchCredits;
+                });
+                
+                displayMatieres(filtered);
+            }
+
+            function setupEventListeners() {
+                document.getElementById('search-input').addEventListener('input', filterMatieres);
+                document.getElementById('filter-credits').addEventListener('change', filterMatieres);
+            }
+
+            function showLoadingState(show) {
+                const loadingElements = document.querySelectorAll('.fa-spinner');
+                loadingElements.forEach(el => {
+                    el.style.display = show ? 'inline-block' : 'none';
+                });
+            }
+
+            function showError(message) {
+                alert(message); // À remplacer par une notification plus élégante
+            }
+
+            // Données de démonstration
+            function getDemoMatieres() {
+                return [
+                    {
+                        libelle_mat: "Algorithmique Avancée",
+                        nb_credit: 5,
+                        libelle_cl: "Licence 3 Informatique",
+                        nom_ens: "Martin",
+                        prenom_ens: "Sophie",
+                        email_ens: "sophie.martin@univ.fr",
+                        matricule_ens: "ENS001"
+                    },
+                    {
+                        libelle_mat: "Base de Données",
+                        nb_credit: 4,
+                        libelle_cl: "Licence 3 Informatique",
+                        nom_ens: "Dubois",
+                        prenom_ens: "Pierre",
+                        email_ens: "pierre.dubois@univ.fr",
+                        matricule_ens: "ENS002"
+                    },
+                    {
+                        libelle_mat: "Réseaux Informatiques",
+                        nb_credit: 6,
+                        libelle_cl: "Licence 3 Informatique",
+                        nom_ens: "Leroy",
+                        prenom_ens: "Marie",
+                        email_ens: "marie.leroy@univ.fr",
+                        matricule_ens: "ENS003"
+                    },
+                    {
+                        libelle_mat: "Développement Web",
+                        nb_credit: 5,
+                        libelle_cl: "Licence 3 Informatique",
+                        nom_ens: "Moreau",
+                        prenom_ens: "Thomas",
+                        email_ens: "thomas.moreau@univ.fr",
+                        matricule_ens: "ENS004"
+                    },
+                    {
+                        libelle_mat: "Systèmes d'Exploitation",
+                        nb_credit: 4,
+                        libelle_cl: "Licence 3 Informatique",
+                        nom_ens: "Simon",
+                        prenom_ens: "Julie",
+                        email_ens: "julie.simon@univ.fr",
+                        matricule_ens: "ENS005"
+                    },
+                    {
+                        libelle_mat: "Anglais Technique",
+                        nb_credit: 3,
+                        libelle_cl: "Licence 3 Informatique",
+                        nom_ens: "Bernard",
+                        prenom_ens: "Claire",
+                        email_ens: "claire.bernard@univ.fr",
+                        matricule_ens: "ENS006"
+                    },
+                    {
+                        libelle_mat: "Mathématiques pour l'Informatique",
+                        nb_credit: 5,
+                        libelle_cl: "Licence 3 Informatique",
+                        nom_ens: "Petit",
+                        prenom_ens: "Nicolas",
+                        email_ens: "nicolas.petit@univ.fr",
+                        matricule_ens: "ENS007"
+                    },
+                    {
+                        libelle_mat: "Projet de Fin d'Études",
+                        nb_credit: 8,
+                        libelle_cl: "Licence 3 Informatique",
+                        nom_ens: null,
+                        prenom_ens: null,
+                        email_ens: null,
+                        matricule_ens: null
+                    }
+                ];
+            }
+        });
+    </script>
+</body>
+</html>

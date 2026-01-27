@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>📚 Matières par Classe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../js/auth-simple.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4361ee',
+                        secondary: '#7209b7'
+                    },
+                    screens: {
+                        'xs': '475px',
+                        'sm': '640px',
+                        'md': '768px',
+                        'lg': '1024px',
+                        'xl': '1280px',
+                        '2xl': '1536px'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Optimisations pour très petits écrans */
+        @media (max-width: 375px) {
+            .tiny-text-xs { font-size: 0.7rem !important; }
+            .tiny-text-sm { font-size: 0.8rem !important; }
+            .tiny-text-base { font-size: 0.9rem !important; }
+            .tiny-text-lg { font-size: 1rem !important; }
+            .tiny-text-xl { font-size: 1.125rem !important; }
+            .tiny-p-2 { padding: 0.5rem !important; }
+            .tiny-p-3 { padding: 0.75rem !important; }
+            .tiny-p-4 { padding: 1rem !important; }
+            .tiny-gap-2 { gap: 0.5rem !important; }
+            .tiny-gap-3 { gap: 0.75rem !important; }
+        }
+        
+        /* Pour les tablettes en mode portrait */
+        @media (min-width: 640px) and (max-width: 768px) {
+            .tablet-grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+            .tablet-w-full { width: 100% !important; }
+        }
+        
+        /* Pour éviter les débordements horizontaux */
+        .overflow-wrap-break {
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+        
+        /* Scrollbar personnalisée */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        
+        /* Animations */
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fade-in 0.3s ease; }
+        
+        @keyframes slide-in-right {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .animate-slide-in-right { animation: slide-in-right 0.3s ease; }
+        
+        /* Optimisation pour les touches tactiles */
+        @media (hover: none) and (pointer: coarse) {
+            .touch-target {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            .touch-text {
+                font-size: 16px;
+            }
+            .touch-select {
+                font-size: 16px;
+            }
+        }
+        
+        /* Optimisations spécifiques pour iPad */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .ipad-grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+            .ipad-text-lg { font-size: 1rem !important; }
+            .ipad-text-xl { font-size: 1.125rem !important; }
+            .ipad-p-4 { padding: 1rem !important; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+
+    <!-- Navbar Responsive -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50 border-b-4 border-primary">
+        <div class="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-14 sm:h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-white text-sm sm:text-lg md:text-xl"></i>
+                    </div>
+                    <span class="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent overflow-wrap-break max-w-[120px] sm:max-w-none">
+                        GestNotes
+                    </span>
+                </a>
+
+                <!-- Desktop Menu (caché sur mobile) -->
+                <div class="hidden md:flex items-center gap-1 lg:gap-2">
+                    <a href="index.html" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2 text-sm sm:text-base">
+                        <i class="fas fa-home"></i> 
+                        <span class="hidden lg:inline">Accueil</span>
+                    </a>
+                    <a href="periodes.html" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2 text-sm sm:text-base">
+                        <i class="fas fa-calendar-alt"></i> 
+                        <span class="hidden lg:inline">Périodes</span>
+                    </a>
+                    <a href="matieres.html" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg bg-primary text-white font-medium flex items-center gap-2 text-sm sm:text-base shadow-sm hover:shadow-md transition">
+                        <i class="fas fa-book"></i> 
+                        <span class="hidden lg:inline">Matières</span>
+                    </a>
+                    <a href="evaluations.html" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2 text-sm sm:text-base">
+                        <i class="fas fa-chart-line"></i> 
+                        <span class="hidden lg:inline">Évaluations</span>
+                    </a>
+                </div>
+
+                <!-- User Info & Mobile Menu Button -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <!-- User Profile (Desktop) -->
+                    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-lg">
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-user text-white text-xs sm:text-sm"></i>
+                        </div>
+                        <span id="navbar-username" class="text-xs sm:text-sm font-medium text-slate-700 overflow-wrap-break max-w-[100px] lg:max-w-[150px]">Chargement...</span>
+                    </div>
+
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-button" class="md:hidden p-2 text-slate-600 hover:text-primary transition touch-target">
+                        <i class="fas fa-bars text-lg sm:text-xl"></i>
+                    </button>
+
+                    <!-- Déconnexion (Desktop) -->
+                    <button onclick="auth.logout()" class="hidden md:flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-medium text-xs sm:text-sm">
+                        <i class="fas fa-sign-out-alt text-xs sm:text-sm"></i>
+                        <span class="hidden lg:inline">Déconnecter</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu (déroulant) -->
+            <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-200 animate-slide-in-right">
+                <div class="px-3 sm:px-4 py-3 space-y-2">
+                    <a href="index.html" class="block px-4 py-3 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-3">
+                        <i class="fas fa-home w-5"></i> 
+                        <span>Accueil</span>
+                    </a>
+                    <a href="periodes.html" class="block px-4 py-3 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-3">
+                        <i class="fas fa-calendar-alt w-5"></i> 
+                        <span>Périodes</span>
+                    </a>
+                    <a href="matieres.html" class="block px-4 py-3 rounded-lg bg-primary text-white font-medium flex items-center gap-3">
+                        <i class="fas fa-book w-5"></i> 
+                        <span>Matières</span>
+                    </a>
+                    <a href="evaluations.html" class="block px-4 py-3 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-3">
+                        <i class="fas fa-chart-line w-5"></i> 
+                        <span>Évaluations</span>
+                    </a>
+                    
+                    <!-- User Info Mobile -->
+                    <div class="flex items-center gap-3 px-4 py-3 bg-slate-50 rounded-lg mt-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div id="mobile-username" class="font-medium text-slate-700 text-sm overflow-wrap-break">Chargement...</div>
+                            <div class="text-xs text-slate-500">Enseignant</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Déconnexion Mobile -->
+                    <button onclick="auth.logout()" class="w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 text-red-600 font-medium transition flex items-center gap-3 mt-2">
+                        <i class="fas fa-sign-out-alt w-5"></i> 
+                        <span>Déconnexion</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Responsive -->
+    <div class="bg-gradient-to-r from-green-600 to-green-700 text-white">
+        <div class="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-10 lg:py-12">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
+                <!-- Partie gauche : Bouton retour + titre -->
+                <div class="flex-1 min-w-0">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6">
+                        <!-- Bouton Retour -->
+                        <a href="index.html" 
+                           class="order-2 sm:order-1 bg-white/20 hover:bg-white/30 text-white px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg transition-all duration-200 flex items-center gap-2 w-fit hover:shadow-md active:scale-95 touch-target">
+                            <i class="fas fa-arrow-left text-sm sm:text-base"></i>
+                            <span class="whitespace-nowrap text-sm sm:text-base">Retour</span>
+                        </a>
+                        
+                        <!-- Titre et description -->
+                        <div class="order-1 sm:order-2 flex-1 min-w-0">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4 mb-2">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-book text-xl sm:text-2xl md:text-3xl text-white/90"></i>
+                                    <h1 class="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold truncate overflow-wrap-break tiny-text-xl">
+                                        Matières par Classe
+                                    </h1>
+                                </div>
+                            </div>
+                            <p class="text-sm sm:text-base md:text-lg text-white/90 leading-relaxed overflow-wrap-break">
+                                Organisez les matières par niveau d'études
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Partie droite : Bouton d'action -->
+                <div class="lg:self-start mt-4 lg:mt-0">
+                    <button onclick="openModal()"
+                        class="w-full sm:w-auto bg-white text-green-600 hover:text-green-700 px-4 sm:px-5 py-3 sm:py-3.5 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-green-500/20 touch-target text-sm sm:text-base">
+                        <i class="fas fa-plus-circle text-base sm:text-lg"></i>
+                        <span class="whitespace-nowrap">Nouvelle Matière</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Responsive -->
+    <main class="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+        <!-- Filtres -->
+        <div class="bg-white rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 mb-4 sm:mb-6">
+            <div class="flex flex-col lg:flex-row gap-3 sm:gap-4 items-start lg:items-center">
+                <div class="flex-1 w-full">
+                    <label class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Rechercher une matière ou classe</label>
+                    <input type="text" id="search-input" placeholder="Rechercher..."
+                        class="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base touch-text">
+                </div>
+                <div class="flex flex-col xs:flex-row gap-2 w-full lg:w-auto">
+                    <select id="filter-classe"
+                        class="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base touch-select flex-1 xs:flex-none">
+                        <option value="">Toutes les classes</option>
+                    </select>
+                    <select id="filter-credits"
+                        class="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base touch-select flex-1 xs:flex-none">
+                        <option value="">Tous les crédits</option>
+                        <option value="3-4">3-4 crédits</option>
+                        <option value="5-6">5-6 crédits</option>
+                        <option value="7+">7+ crédits</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 hover:shadow-lg transition-all tiny-p-3">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-book text-blue-600 text-sm sm:text-base md:text-xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm text-gray-500 tiny-text-sm">Total</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-bold text-gray-800 tiny-text-lg" id="total-matieres">0</div>
+                <div class="text-xs sm:text-sm text-gray-600 tiny-text-base">Matières</div>
+            </div>
+
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 hover:shadow-lg transition-all tiny-p-3">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-green-600 text-sm sm:text-base md:text-xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm text-gray-500 tiny-text-sm">Total</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-bold text-gray-800 tiny-text-lg" id="total-classes">0</div>
+                <div class="text-xs sm:text-sm text-gray-600 tiny-text-base">Classes</div>
+            </div>
+
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 hover:shadow-lg transition-all tiny-p-3">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-star text-purple-600 text-sm sm:text-base md:text-xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm text-gray-500 tiny-text-sm">Total</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-bold text-gray-800 tiny-text-lg" id="total-credits">0</div>
+                <div class="text-xs sm:text-sm text-gray-600 tiny-text-base">Crédits</div>
+            </div>
+        </div>
+
+        <!-- Liste des matières par classe -->
+        <div id="matieres-container">
+            <div class="text-center py-8 sm:py-12 text-gray-500">
+                <div class="flex flex-col items-center gap-3 sm:gap-4">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-spinner fa-spin text-xl sm:text-2xl md:text-3xl text-gray-400"></i>
+                    </div>
+                    <p class="text-sm sm:text-base font-medium text-gray-600">Chargement des matières...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal d'ajout de matière -->
+    <div id="modal-ajout" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 max-w-md w-full mx-auto animate-fade-in custom-scrollbar max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4 sm:mb-6 sticky top-0 bg-white py-2">
+                <h3 class="text-lg sm:text-xl md:text-2xl font-bold flex items-center gap-2 sm:gap-3">
+                    <i class="fas fa-plus-circle text-primary text-base sm:text-lg md:text-xl"></i>
+                    <span id="modal-title" class="overflow-wrap-break">Ajouter une Matière</span>
+                </h3>
+                <button onclick="closeModal()" class="p-1 sm:p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 touch-target">
+                    <i class="fas fa-times text-lg sm:text-xl"></i>
+                </button>
+            </div>
+            <form id="form-ajout-matiere" class="space-y-3 sm:space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Code de la matière</label>
+                    <input type="text" id="code_mat" required
+                        class="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base touch-text"
+                        placeholder="Ex: MATH_L1">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Libellé de la matière</label>
+                    <input type="text" id="libelle_mat" required
+                        class="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base touch-text"
+                        placeholder="Ex: Mathématiques 1">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Nombre de crédits</label>
+                    <input type="number" id="nb_credit" required min="1" max="10"
+                        class="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base touch-text"
+                        placeholder="Entre 1 et 10">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Classe</label>
+                    <select id="code_cl" required
+                        class="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base touch-select">
+                        <option value="">Sélectionner une classe</option>
+                    </select>
+                </div>
+                <div class="flex flex-col xs:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4">
+                    <button type="submit"
+                        class="flex-1 bg-primary text-white py-2.5 sm:py-3 rounded-lg font-medium hover:bg-primary-dark transition text-sm sm:text-base touch-target">
+                        <i class="fas fa-save mr-2"></i> Enregistrer
+                    </button>
+                    <button type="button" onclick="closeModal()"
+                        class="flex-1 bg-gray-200 text-gray-700 py-2.5 sm:py-3 rounded-lg font-medium hover:bg-gray-300 transition text-sm sm:text-base touch-target">
+                        <i class="fas fa-times mr-2"></i> Annuler
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script principal matieres.html -->
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let allMatieres = [];
+        let allClasses = [];
+        let editingMatiere = null;
+        let matiereToDelete = null;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Page Matières initialisée');
+            
+            // Menu mobile
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+                
+                // Fermer le menu en cliquant à l'extérieur
+                document.addEventListener('click', (e) => {
+                    if (!mobileMenu.contains(e.target) && !mobileMenuButton.contains(e.target)) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // Charger les données
+            loadData();
+            
+            // Mettre à jour le nom d'utilisateur
+            updateUsername();
+            
+            // Initialiser les événements
+            initEvents();
+        });
+
+        // Mettre à jour le nom d'utilisateur
+        function updateUsername() {
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user) {
+                    const displayName = `${user.prenom} ${user.nom}`;
+                    const navbarUser = document.getElementById('navbar-username');
+                    const mobileUser = document.getElementById('mobile-username');
+                    
+                    if (navbarUser) navbarUser.textContent = displayName;
+                    if (mobileUser) mobileUser.textContent = displayName;
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        // Initialiser les événements
+        function initEvents() {
+            // Recherche
+            const searchInput = document.getElementById('search-input');
+            const filterClasse = document.getElementById('filter-classe');
+            const filterCredits = document.getElementById('filter-credits');
+            
+            if (searchInput) searchInput.addEventListener('input', filterMatieres);
+            if (filterClasse) filterClasse.addEventListener('change', filterMatieres);
+            if (filterCredits) filterCredits.addEventListener('change', filterMatieres);
+            
+            // Formulaire
+            const form = document.getElementById('form-ajout-matiere');
+            if (form) {
+                form.addEventListener('submit', handleSubmit);
+            }
+            
+            // Fermer les modals
+            const mainModal = document.getElementById('modal-ajout');
+            if (mainModal) {
+                mainModal.addEventListener('click', (e) => {
+                    if (e.target === mainModal) {
+                        closeModal();
+                    }
+                });
+            }
+            
+            // Fermer avec Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                    closeDeleteModal();
+                    closeSuccessModal();
+                    closeErrorModal();
+                }
+            });
+        }
+
+        // ==================== MODAL DÉCONNEXION ====================
+        function deconnexion() {
+            // Créer le modal de déconnexion
+            const modalHTML = `
+                <div id="logoutModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black bg-opacity-50">
+                    <div class="bg-white rounded-xl shadow-xl max-w-md w-full animate-fade-in">
+                        <!-- Header -->
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-lg">
+                                    <i class="fas fa-sign-out-alt text-red-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800">Déconnexion</h3>
+                                    <p class="text-sm text-gray-500">Confirmez la déconnexion</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="px-6 py-4">
+                            <p class="text-gray-700 mb-4">
+                                Êtes-vous sûr de vouloir vous déconnecter ?
+                            </p>
+                            
+                            <div class="p-3 bg-red-50 border border-red-100 rounded-lg">
+                                <div class="flex items-start gap-2">
+                                    <i class="fas fa-info-circle text-red-500 mt-0.5"></i>
+                                    <p class="text-sm text-red-700">
+                                        Vous devrez vous reconnecter pour accéder à nouveau à votre compte.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
+                            <div class="flex gap-3">
+                                <button onclick="closeLogoutModal()" 
+                                        class="flex-1 px-4 py-2.5 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition">
+                                    Annuler
+                                </button>
+                                <button onclick="confirmLogout()" 
+                                        class="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition flex items-center justify-center gap-2">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Se déconnecter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Empêcher le scroll sur le body
+            document.body.style.overflow = 'hidden';
+            
+            // Fermer le modal en cliquant à l'extérieur
+            const logoutModal = document.getElementById('logoutModal');
+            logoutModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeLogoutModal();
+                }
+            });
+        }
+        window.deconnexion = deconnexion;
+
+        // Fermer le modal de déconnexion
+        function closeLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            if (modal) {
+                modal.remove();
+                document.body.style.overflow = '';
+            }
+        }
+        window.closeLogoutModal = closeLogoutModal;
+
+        // Confirmer la déconnexion
+        function confirmLogout() {
+            localStorage.removeItem('user');
+            window.location.href = '../auth-fixed.html';
+        }
+
+        // ==================== CHARGEMENT DES DONNÉES ====================
+
+        async function loadData() {
+            try {
+                showLoading(true);
+                
+                const [matieresResponse, classesResponse] = await Promise.all([
+                    fetch(`${API_URL}/matieres`),
+                    fetch(`${API_URL}/classes`)
+                ]);
+                
+                if (!matieresResponse.ok) throw new Error(`Erreur ${matieresResponse.status}: ${matieresResponse.statusText}`);
+                if (!classesResponse.ok) throw new Error(`Erreur ${classesResponse.status}: ${classesResponse.statusText}`);
+                
+                allMatieres = await matieresResponse.json();
+                allClasses = await classesResponse.json();
+                
+                console.log('Données chargées:', { matieres: allMatieres.length, classes: allClasses.length });
+                
+                populateFilters();
+                updateStatistics();
+                displayMatieres(allMatieres);
+                
+            } catch (error) {
+                console.error('Erreur chargement des données:', error);
+                showDemoData();
+                showErrorNotification(
+                    'Mode démo activé',
+                    'Connexion à l\'API impossible. Affichage des données de démo.',
+                    false
+                );
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Données de démonstration
+        function showDemoData() {
+            allClasses = [
+                { code_cl: 'L1_GI', libelle_cl: 'Licence 1 Génie Informatique' },
+                { code_cl: 'L2_GI', libelle_cl: 'Licence 2 Génie Informatique' },
+                { code_cl: 'L3_GI', libelle_cl: 'Licence 3 Génie Informatique' }
+            ];
+            
+            allMatieres = [
+                { 
+                    code_mat: 'ALGO_L1', 
+                    libelle_mat: 'Algorithmique et Programmation', 
+                    nb_credit: 6, 
+                    code_cl: 'L1_GI',
+                    libelle_cl: 'Licence 1 Génie Informatique'
+                },
+                { 
+                    code_mat: 'MATH1_L1', 
+                    libelle_mat: 'Mathématiques 1', 
+                    nb_credit: 5, 
+                    code_cl: 'L1_GI',
+                    libelle_cl: 'Licence 1 Génie Informatique'
+                },
+                { 
+                    code_mat: 'POO_L2', 
+                    libelle_mat: 'Programmation Orientée Objet', 
+                    nb_credit: 6, 
+                    code_cl: 'L2_GI',
+                    libelle_cl: 'Licence 2 Génie Informatique'
+                }
+            ];
+            
+            populateFilters();
+            updateStatistics();
+            displayMatieres(allMatieres);
+        }
+
+        // Afficher le chargement
+        function showLoading(show) {
+            const container = document.getElementById('matieres-container');
+            if (!container) return;
+            
+            if (show) {
+                container.innerHTML = `
+                    <div class="text-center py-8 sm:py-12 text-gray-500">
+                        <div class="flex flex-col items-center gap-3 sm:gap-4">
+                            <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-spinner fa-spin text-xl sm:text-2xl md:text-3xl text-gray-400"></i>
+                            </div>
+                            <p class="text-sm sm:text-base font-medium text-gray-600">Chargement des matières...</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Remplir les filtres
+        function populateFilters() {
+            const classeFilter = document.getElementById('filter-classe');
+            const classeSelect = document.getElementById('code_cl');
+            
+            if (!classeFilter || !classeSelect) return;
+            
+            classeFilter.innerHTML = '<option value="">Toutes les classes</option>';
+            classeSelect.innerHTML = '<option value="">Sélectionner une classe</option>';
+            
+            allClasses.forEach(classe => {
+                const option1 = document.createElement('option');
+                option1.value = classe.code_cl;
+                option1.textContent = classe.libelle_cl;
+                option1.className = 'overflow-wrap-break';
+                classeFilter.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = classe.code_cl;
+                option2.textContent = classe.libelle_cl;
+                option2.className = 'overflow-wrap-break';
+                classeSelect.appendChild(option2);
+            });
+        }
+
+        // ==================== AFFICHAGE DES MATIÈRES ====================
+
+        // Mettre à jour les statistiques
+        function updateStatistics() {
+            const totalMatieres = allMatieres.length;
+            const totalClasses = [...new Set(allMatieres.map(m => m.code_cl))].length;
+            const totalCredits = allMatieres.reduce((sum, m) => sum + (m.nb_credit || 0), 0);
+            
+            const totalMatieresEl = document.getElementById('total-matieres');
+            const totalClassesEl = document.getElementById('total-classes');
+            const totalCreditsEl = document.getElementById('total-credits');
+            
+            if (totalMatieresEl) totalMatieresEl.textContent = totalMatieres;
+            if (totalClassesEl) totalClassesEl.textContent = totalClasses;
+            if (totalCreditsEl) totalCreditsEl.textContent = totalCredits;
+        }
+
+        // Afficher les matières par classe
+        function displayMatieres(matieres) {
+            const container = document.getElementById('matieres-container');
+            if (!container) return;
+            
+            // Grouper par classe
+            const matieresParClasse = {};
+            matieres.forEach(mat => {
+                if (!matieresParClasse[mat.code_cl]) {
+                    const classe = allClasses.find(c => c.code_cl === mat.code_cl);
+                    matieresParClasse[mat.code_cl] = {
+                        libelle_cl: classe ? classe.libelle_cl : mat.code_cl,
+                        matieres: []
+                    };
+                }
+                matieresParClasse[mat.code_cl].matieres.push(mat);
+            });
+            
+            if (Object.keys(matieresParClasse).length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 sm:py-12 text-gray-500">
+                        <div class="flex flex-col items-center gap-3 sm:gap-4">
+                            <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-book-open text-xl sm:text-2xl md:text-3xl text-gray-400"></i>
+                            </div>
+                            <p class="text-sm sm:text-base font-medium text-gray-600">Aucune matière trouvée</p>
+                            <button onclick="openModal()" 
+                                    class="px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-bold hover:shadow-lg transition flex items-center gap-2 text-sm sm:text-base touch-target">
+                                <i class="fas fa-plus-circle"></i> Ajouter une matière
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = Object.entries(matieresParClasse).map(([codeCl, classe]) => {
+                const totalCreditsClasse = classe.matieres.reduce((sum, m) => sum + (m.nb_credit || 0), 0);
+                
+                return `
+                    <div class="bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden mb-4 sm:mb-6">
+                        <div class="bg-gradient-to-r from-primary to-secondary text-white p-4 sm:p-6">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="text-lg sm:text-xl md:text-2xl font-bold flex items-center gap-2 sm:gap-3 overflow-wrap-break">
+                                        <i class="fas fa-graduation-cap text-sm sm:text-base"></i>
+                                        ${classe.libelle_cl}
+                                    </h3>
+                                    <p class="text-sm sm:text-base opacity-90 mt-1">${classe.matieres.length} matière(s) - ${totalCreditsClasse} crédits totaux</p>
+                                </div>
+                                <span class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/20 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium mt-2 md:mt-0">
+                                    <i class="fas fa-hashtag text-xs"></i> ${codeCl}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-4 sm:p-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                                ${classe.matieres.map(mat => {
+                                    let creditColor = 'bg-blue-100 text-blue-800';
+                                    if (mat.nb_credit >= 7) {
+                                        creditColor = 'bg-purple-100 text-purple-800';
+                                    } else if (mat.nb_credit >= 5) {
+                                        creditColor = 'bg-green-100 text-green-800';
+                                    }
+                                    
+                                    return `
+                                        <div class="bg-gradient-to-br from-gray-50 to-white rounded-lg sm:rounded-xl border border-gray-200 p-3 sm:p-4 hover:shadow-md transition-all hover:scale-[1.01] active:scale-95">
+                                            <div class="flex items-start justify-between mb-2 sm:mb-3">
+                                                <div class="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                                                    <i class="fas fa-book text-white text-sm sm:text-base"></i>
+                                                </div>
+                                                <span class="px-2 py-1 ${creditColor} rounded-full text-xs font-medium">
+                                                    ${mat.nb_credit} crédits
+                                                </span>
+                                            </div>
+                                            <h4 class="font-bold text-gray-800 text-sm sm:text-base mb-1 overflow-wrap-break">${mat.libelle_mat}</h4>
+                                            <p class="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 font-mono overflow-wrap-break">${mat.code_mat}</p>
+                                            <div class="flex gap-2">
+                                                <button onclick="editMatiere('${mat.code_mat}')" 
+                                                        class="p-2 w-8 h-8 sm:w-9 sm:h-9 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition transform hover:scale-110 touch-target"
+                                                        title="Modifier">
+                                                    <i class="fas fa-edit text-xs sm:text-sm"></i>
+                                                </button>
+                                                <button onclick="showDeleteModal('${mat.code_mat}', '${mat.libelle_mat.replace(/'/g, "\\'").replace(/"/g, '\\"')}')" 
+                                                        class="p-2 w-8 h-8 sm:w-9 sm:h-9 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition transform hover:scale-110 touch-target"
+                                                        title="Supprimer">
+                                                    <i class="fas fa-trash text-xs sm:text-sm"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filtrer les matières
+        function filterMatieres() {
+            const searchInput = document.getElementById('search-input');
+            const filterClasse = document.getElementById('filter-classe');
+            const filterCredits = document.getElementById('filter-credits');
+            
+            if (!searchInput || !filterClasse || !filterCredits) return;
+            
+            const searchTerm = searchInput.value.toLowerCase();
+            const classeFilter = filterClasse.value;
+            const creditsFilter = filterCredits.value;
+            
+            const filtered = allMatieres.filter(mat => {
+                const matchSearch = !searchTerm || 
+                    (mat.libelle_mat && mat.libelle_mat.toLowerCase().includes(searchTerm)) ||
+                    (mat.code_mat && mat.code_mat.toLowerCase().includes(searchTerm)) ||
+                    (mat.libelle_cl && mat.libelle_cl.toLowerCase().includes(searchTerm));
+                
+                const matchClasse = !classeFilter || mat.code_cl === classeFilter;
+                
+                let matchCredits = true;
+                if (creditsFilter && mat.nb_credit) {
+                    if (creditsFilter === '3-4') {
+                        matchCredits = mat.nb_credit >= 3 && mat.nb_credit <= 4;
+                    } else if (creditsFilter === '5-6') {
+                        matchCredits = mat.nb_credit >= 5 && mat.nb_credit <= 6;
+                    } else if (creditsFilter === '7+') {
+                        matchCredits = mat.nb_credit >= 7;
+                    }
+                }
+                
+                return matchSearch && matchClasse && matchCredits;
+            });
+            
+            displayMatieres(filtered);
+        }
+
+        // ==================== MODAL AJOUT/MODIFICATION ====================
+
+        // Ouvrir le modal
+        function openModal() {
+            editingMatiere = null;
+            document.getElementById('modal-title').textContent = 'Ajouter une Matière';
+            document.getElementById('code_mat').readOnly = false;
+            document.getElementById('code_mat').value = '';
+            document.getElementById('libelle_mat').value = '';
+            document.getElementById('nb_credit').value = '';
+            document.getElementById('code_cl').value = '';
+            
+            document.getElementById('modal-ajout').classList.remove('hidden');
+        }
+        window.openModal = openModal;
+
+        // Fermer le modal
+        function closeModal() {
+            document.getElementById('modal-ajout').classList.add('hidden');
+            document.getElementById('form-ajout-matiere').reset();
+            editingMatiere = null;
+        }
+        window.closeModal = closeModal;
+
+        // Modifier une matière
+        function editMatiere(codeMat) {
+            const matiere = allMatieres.find(m => m.code_mat === codeMat);
+            if (!matiere) {
+                showErrorNotification('Erreur', 'Matière non trouvée');
+                return;
+            }
+            
+            editingMatiere = matiere;
+            document.getElementById('modal-title').textContent = 'Modifier la Matière';
+            document.getElementById('code_mat').value = matiere.code_mat;
+            document.getElementById('libelle_mat').value = matiere.libelle_mat;
+            document.getElementById('nb_credit').value = matiere.nb_credit;
+            document.getElementById('code_cl').value = matiere.code_cl;
+            document.getElementById('code_mat').readOnly = true;
+            
+            document.getElementById('modal-ajout').classList.remove('hidden');
+        }
+        window.editMatiere = editMatiere;
+
+        // ==================== MODAL SUPPRESSION ====================
+
+        // Afficher le modal de suppression
+        function showDeleteModal(codeMat, libelleMat) {
+            matiereToDelete = { code: codeMat, libelle: libelleMat };
+            
+            const modalHTML = `
+                <div id="deleteModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black bg-opacity-50">
+                    <div class="bg-white rounded-xl shadow-xl max-w-md w-full animate-fade-in">
+                        <!-- Header -->
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-lg">
+                                    <i class="fas fa-exclamation-triangle text-red-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800">Supprimer la matière</h3>
+                                    <p class="text-sm text-gray-500">Confirmez la suppression</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="px-6 py-4">
+                            <p class="text-gray-700 mb-4">
+                                Voulez-vous vraiment supprimer la matière :
+                            </p>
+                            
+                            <div class="mb-4 p-4 bg-gray-50 rounded-lg">
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-medium text-gray-600">Code :</span>
+                                        <span class="font-semibold text-gray-800">${codeMat}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-medium text-gray-600">Matière :</span>
+                                        <span class="font-semibold text-gray-800">${libelleMat}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-3 bg-red-50 border border-red-100 rounded-lg">
+                                <div class="flex items-start gap-2">
+                                    <i class="fas fa-info-circle text-red-500 mt-0.5"></i>
+                                    <p class="text-sm text-red-700">
+                                        Cette action est irréversible. Cette matière sera définitivement supprimée.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
+                            <div class="flex gap-3">
+                                <button onclick="closeDeleteModal()" 
+                                        class="flex-1 px-4 py-2.5 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition">
+                                    Annuler
+                                </button>
+                                <button onclick="confirmDeleteMatiere()" 
+                                        class="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition flex items-center justify-center gap-2">
+                                    <i class="fas fa-trash"></i>
+                                    Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Empêcher le scroll sur le body
+            document.body.style.overflow = 'hidden';
+            
+            // Fermer le modal en cliquant à l'extérieur
+            const deleteModal = document.getElementById('deleteModal');
+            deleteModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeDeleteModal();
+                }
+            });
+        }
+        window.showDeleteModal = showDeleteModal;
+
+        // Fermer le modal de suppression
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            if (modal) {
+                modal.remove();
+                document.body.style.overflow = '';
+                matiereToDelete = null;
+            }
+        }
+        window.closeDeleteModal = closeDeleteModal;
+
+        // Confirmer la suppression
+        async function confirmDeleteMatiere() {
+            if (!matiereToDelete) return;
+            
+            try {
+                // Animation de chargement sur le bouton
+                const deleteBtn = document.querySelector('button[onclick="confirmDeleteMatiere()"]');
+                const originalText = deleteBtn.innerHTML;
+                deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                deleteBtn.disabled = true;
+                
+                // Appel API pour suppression côté serveur
+                const response = await fetch(`${API_URL}/matieres/${matiereToDelete.code}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la suppression');
+                }
+                
+                // Suppression côté client
+                allMatieres = allMatieres.filter(m => m.code_mat !== matiereToDelete.code);
+                updateStatistics();
+                displayMatieres(allMatieres);
+                
+                // Fermer le modal
+                closeDeleteModal();
+                
+                // Afficher notification de succès
+                showSuccessNotification('Matière supprimée', `"${matiereToDelete.libelle}" a été supprimée avec succès.`);
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                
+                // Réactiver le bouton
+                const deleteBtn = document.querySelector('button[onclick="confirmDeleteMatiere()"]');
+                if (deleteBtn) {
+                    deleteBtn.innerHTML = originalText;
+                    deleteBtn.disabled = false;
+                }
+                
+                // Afficher notification d'erreur
+                showErrorNotification('Erreur', 'Erreur lors de la suppression. Veuillez réessayer.');
+            }
+        }
+
+        // ==================== GESTION FORMULAIRE ====================
+
+        // Gérer la soumission du formulaire
+        async function handleSubmit(event) {
+            event.preventDefault();
+            
+            const formData = {
+                code_mat: document.getElementById('code_mat').value.trim(),
+                libelle_mat: document.getElementById('libelle_mat').value.trim(),
+                nb_credit: parseInt(document.getElementById('nb_credit').value),
+                code_cl: document.getElementById('code_cl').value
+            };
+            
+            // Validation
+            if (!formData.code_mat || !formData.libelle_mat || !formData.nb_credit || !formData.code_cl) {
+                showErrorNotification('Champs requis', 'Tous les champs sont obligatoires');
+                return;
+            }
+            
+            if (formData.nb_credit < 1 || formData.nb_credit > 10) {
+                showErrorNotification('Erreur de crédits', 'Le nombre de crédits doit être entre 1 et 10');
+                return;
+            }
+            
+            try {
+                const url = editingMatiere ? `${API_URL}/matieres/${editingMatiere.code_mat}` : `${API_URL}/matieres`;
+                const method = editingMatiere ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erreur lors de l\'enregistrement');
+                }
+                
+                const result = await response.json();
+                
+                let successTitle = '';
+                let successMessage = '';
+                
+                if (editingMatiere) {
+                    // Mise à jour côté client
+                    const index = allMatieres.findIndex(m => m.code_mat === editingMatiere.code_mat);
+                    if (index !== -1) {
+                        allMatieres[index] = { ...allMatieres[index], ...formData };
+                    }
+                    successTitle = 'Modification réussie';
+                    successMessage = `La matière "${formData.libelle_mat}" a été modifiée avec succès.`;
+                } else {
+                    // Vérifier si le code existe déjà
+                    if (allMatieres.some(m => m.code_mat === formData.code_mat)) {
+                        showErrorNotification('Code existant', 'Ce code de matière existe déjà');
+                        return;
+                    }
+                    
+                    // Ajout côté client
+                    const classe = allClasses.find(c => c.code_cl === formData.code_cl);
+                    allMatieres.push({
+                        ...formData,
+                        libelle_cl: classe ? classe.libelle_cl : formData.code_cl
+                    });
+                    successTitle = 'Ajout réussi';
+                    successMessage = `La matière "${formData.libelle_mat}" a été ajoutée avec succès.`;
+                }
+                
+                closeModal();
+                updateStatistics();
+                displayMatieres(allMatieres);
+                showSuccessNotification(successTitle, successMessage);
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                showErrorNotification('Erreur', 'Erreur lors de l\'enregistrement. Veuillez réessayer.');
+            }
+        }
+
+        // ==================== NOTIFICATIONS ====================
+
+        function showSuccessNotification(title, message, autoClose = true) {
+            // Créer la notification
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 z-50 animate-fade-in';
+            notification.innerHTML = `
+                <div class="bg-green-500 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 min-w-[300px]">
+                    <i class="fas fa-check-circle text-xl"></i>
+                    <div>
+                        <div class="font-bold">${title}</div>
+                        <div class="text-sm opacity-90">${message}</div>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 transition ml-auto">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Supprimer automatiquement après 5 secondes
+            if (autoClose) {
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 5000);
+            }
+        }
+
+        function showErrorNotification(title, message) {
+            // Créer la notification
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 z-50 animate-fade-in';
+            notification.innerHTML = `
+                <div class="bg-red-500 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 min-w-[300px]">
+                    <i class="fas fa-exclamation-circle text-xl"></i>
+                    <div>
+                        <div class="font-bold">${title}</div>
+                        <div class="text-sm opacity-90">${message}</div>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 transition ml-auto">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Supprimer automatiquement après 5 secondes
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        function closeSuccessModal() {
+            const modal = document.getElementById('success-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+        window.closeSuccessModal = closeSuccessModal;
+
+        function closeErrorModal() {
+            const modal = document.getElementById('error-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+        window.closeErrorModal = closeErrorModal;
+    </script>
+</body>
+</html>

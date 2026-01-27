@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Mes Notes - GestNotes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../js/auth-fixed.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4361ee',
+                        secondary: '#7209b7',
+                        accent: '#f72585'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50 border-b-4 border-primary">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-white text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                        GestNotes
+                    </span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="index.html" class="px-4 py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2">
+                        <i class="fas fa-home"></i>
+                        <span>Accueil</span>
+                    </a>
+                    <a href="matieres.html" class="px-4 py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2">
+                        <i class="fas fa-book"></i>
+                        <span>Matières</span>
+                    </a>
+                    <a href="notes.html" class="px-4 py-2 rounded-lg bg-primary text-white font-medium flex items-center gap-2">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Mes Notes</span>
+                    </a>
+                    <a href="bulletin.html" class="px-4 py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Bulletin</span>
+                    </a>
+                </div>
+
+                <!-- User Info & Déconnexion -->
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-lg">
+                        <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <span id="navbar-username" class="hidden md:block text-sm font-medium text-slate-700">Chargement...</span>
+                    </div>
+                    <button onclick="auth.logout()" class="flex items-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-medium">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="hidden md:inline">Déconnecter</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-green-600 to-green-700 text-white py-12 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <h1 class="text-4xl font-bold mb-2 flex items-center gap-3">
+                        <i class="fas fa-chart-line"></i>
+                        Mes Notes
+                    </h1>
+                    <p class="text-lg opacity-90">Consultez toutes vos évaluations et performances</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold" id="moyenne-header">0.00</div>
+                        <div class="text-sm opacity-90">Moyenne générale</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Filtres -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+            <div class="flex flex-col md:flex-row gap-4 items-center">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Rechercher une matière</label>
+                    <input type="text" id="search-input" placeholder="Rechercher..." 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div class="flex gap-2">
+                    <select id="filter-matiere" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="">Toutes les matières</option>
+                    </select>
+                    <select id="filter-periode" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="">Toutes les périodes</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiques par matière -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8" id="matieres-stats">
+            <!-- Les statistiques seront chargées dynamiquement -->
+        </div>
+
+        <!-- Tableau des notes -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <i class="fas fa-list text-primary"></i>
+                    Détail des Évaluations
+                </h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matière</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Note</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Coef</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Période</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Enseignant</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notes-table" class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                                <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
+                                <p>Chargement des notes...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let allEvaluations = [];
+            let allMatieres = [];
+            let allPeriodes = [];
+
+            // Vérifier l'authentification
+            if (!window.auth || !window.auth.isAuthenticated()) {
+                window.location.href = '../auth-fixed.html';
+                return;
+            }
+
+            // Initialiser
+            initNotes();
+
+            async function initNotes() {
+                try {
+                    const user = window.auth.user;
+                    
+                    // Mettre à jour le nom dans la navbar
+                    document.getElementById('navbar-username').textContent = `${user.nom} ${user.prenom}`;
+                    
+                    // Charger les notes
+                    await loadNotes(user.id);
+                    
+                    // Configurer les événements
+                    setupEventListeners();
+                    
+                } catch (error) {
+                    console.error('Erreur d\'initialisation:', error);
+                    showError('Erreur lors du chargement des notes');
+                }
+            }
+
+            async function loadNotes(userId) {
+                try {
+                    showLoadingState(true);
+                    
+                    // Simuler les requêtes API
+                    // const evalResponse = await window.auth.authenticatedFetch(`/api/etudiants/${userId}/evaluations`);
+                    // allEvaluations = await evalResponse.json();
+                    
+                    // const moyennesResponse = await window.auth.authenticatedFetch(`/api/etudiants/${userId}/moyennes`);
+                    // const moyennesData = await moyennesResponse.json();
+                    
+                    // Données de démonstration
+                    allEvaluations = getDemoEvaluations();
+                    const moyennesData = getDemoMoyennes();
+                    
+                    // Mettre à jour la moyenne générale
+                    if (moyennesData.moyenne_generale) {
+                        document.getElementById('moyenne-header').textContent = moyennesData.moyenne_generale.moyenne_generale.toFixed(2);
+                    }
+                    
+                    // Extraire les matières et périodes uniques
+                    allMatieres = [...new Set(allEvaluations.map(e => e.libelle_mat))];
+                    allPeriodes = [...new Set(allEvaluations.map(e => e.libelle_per))];
+                    
+                    // Remplir les filtres
+                    populateFilters();
+                    
+                    // Afficher les statistiques par matière
+                    displayMatieresStats(moyennesData.moyennes_matieres || []);
+                    
+                    // Afficher le tableau des notes
+                    displayNotes(allEvaluations);
+                    
+                    showLoadingState(false);
+                    
+                } catch (error) {
+                    console.error('Erreur chargement des notes:', error);
+                    showError('Impossible de charger les notes');
+                    throw error;
+                }
+            }
+
+            function populateFilters() {
+                const matiereFilter = document.getElementById('filter-matiere');
+                const periodeFilter = document.getElementById('filter-periode');
+                
+                // Nettoyer les filtres existants
+                matiereFilter.innerHTML = '<option value="">Toutes les matières</option>';
+                periodeFilter.innerHTML = '<option value="">Toutes les périodes</option>';
+                
+                // Ajouter les options
+                allMatieres.forEach(matiere => {
+                    const option = document.createElement('option');
+                    option.value = matiere;
+                    option.textContent = matiere;
+                    matiereFilter.appendChild(option);
+                });
+                
+                allPeriodes.forEach(periode => {
+                    const option = document.createElement('option');
+                    option.value = periode;
+                    option.textContent = periode;
+                    periodeFilter.appendChild(option);
+                });
+            }
+
+            function displayMatieresStats(moyennesMatieres) {
+                const container = document.getElementById('matieres-stats');
+                
+                if (!moyennesMatieres || moyennesMatieres.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-full text-center py-8 text-gray-500">
+                            <i class="fas fa-inbox text-3xl mb-3"></i>
+                            <p>Aucune matière évaluée</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = moyennesMatieres.map(mat => `
+                    <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-gray-800">${mat.libelle_mat}</h3>
+                            <span class="px-3 py-1 rounded-full text-sm font-medium ${mat.statut_validation === 'Validé' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${mat.statut_validation}
+                            </span>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Moyenne:</span>
+                                <span class="text-2xl font-bold ${getMoyenneColor(mat.moyenne_matiere)}">
+                                    ${mat.moyenne_matiere.toFixed(2)}
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Crédits:</span>
+                                <span class="font-medium">${mat.nb_credit}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Évaluations:</span>
+                                <span class="font-medium">${mat.nb_evaluations}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            function displayNotes(evaluations) {
+                const tbody = document.getElementById('notes-table');
+                
+                if (!evaluations || evaluations.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                                <i class="fas fa-inbox text-3xl mb-3"></i>
+                                <p>Aucune note disponible</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                tbody.innerHTML = evaluations.map(eval => `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="font-medium text-gray-900">${eval.libelle_mat}</div>
+                            <div class="text-sm text-gray-500">${eval.nb_credit} crédits</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full ${getTypeColor(eval.type_eval)}">
+                                ${eval.type_eval}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-lg font-bold ${getNoteColor(eval.note)}">
+                                ${eval.note}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${eval.coefficient}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${eval.libelle_per}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${formatDate(eval.date_eval)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${eval.nom_ens} ${eval.prenom_ens}</div>
+                            <div class="text-sm text-gray-500">${eval.email_ens}</div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            function getNoteColor(note) {
+                if (note >= 16) return 'text-green-600';
+                if (note >= 14) return 'text-blue-600';
+                if (note >= 12) return 'text-yellow-600';
+                if (note >= 10) return 'text-orange-600';
+                return 'text-red-600';
+            }
+
+            function getMoyenneColor(moyenne) {
+                if (moyenne >= 16) return 'text-green-600';
+                if (moyenne >= 14) return 'text-blue-600';
+                if (moyenne >= 12) return 'text-yellow-600';
+                if (moyenne >= 10) return 'text-orange-600';
+                return 'text-red-600';
+            }
+
+            function getTypeColor(type) {
+                const colors = {
+                    'CC': 'bg-blue-100 text-blue-800',
+                    'EXAMEN': 'bg-red-100 text-red-800',
+                    'TP': 'bg-green-100 text-green-800',
+                    'PROJET': 'bg-purple-100 text-purple-800',
+                    'ORAL': 'bg-yellow-100 text-yellow-800',
+                    'DEVOIR': 'bg-indigo-100 text-indigo-800'
+                };
+                return colors[type] || 'bg-gray-100 text-gray-800';
+            }
+
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('fr-FR');
+            }
+
+            function filterNotes() {
+                const searchTerm = document.getElementById('search-input').value.toLowerCase();
+                const matiereFilter = document.getElementById('filter-matiere').value;
+                const periodeFilter = document.getElementById('filter-periode').value;
+                
+                const filtered = allEvaluations.filter(eval => {
+                    const matchSearch = !searchTerm || 
+                        eval.libelle_mat.toLowerCase().includes(searchTerm) ||
+                        eval.type_eval.toLowerCase().includes(searchTerm) ||
+                        `${eval.nom_ens} ${eval.prenom_ens}`.toLowerCase().includes(searchTerm);
+                    
+                    const matchMatiere = !matiereFilter || eval.libelle_mat === matiereFilter;
+                    const matchPeriode = !periodeFilter || eval.libelle_per === periodeFilter;
+                    
+                    return matchSearch && matchMatiere && matchPeriode;
+                });
+                
+                displayNotes(filtered);
+            }
+
+            function setupEventListeners() {
+                document.getElementById('search-input').addEventListener('input', filterNotes);
+                document.getElementById('filter-matiere').addEventListener('change', filterNotes);
+                document.getElementById('filter-periode').addEventListener('change', filterNotes);
+            }
+
+            function showLoadingState(show) {
+                const loadingElements = document.querySelectorAll('.fa-spinner');
+                loadingElements.forEach(el => {
+                    el.style.display = show ? 'inline-block' : 'none';
+                });
+            }
+
+            function showError(message) {
+                // Créer une notification d'erreur
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                errorDiv.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                document.body.appendChild(errorDiv);
+                
+                // Supprimer après 5 secondes
+                setTimeout(() => {
+                    errorDiv.remove();
+                }, 5000);
+            }
+
+            // Données de démonstration
+            function getDemoEvaluations() {
+                return [
+                    {
+                        libelle_mat: "Algorithmique Avancée",
+                        type_eval: "CC",
+                        note: 16,
+                        coefficient: 1,
+                        libelle_per: "Semestre 1",
+                        date_eval: "2024-10-15",
+                        nb_credit: 5,
+                        nom_ens: "Martin",
+                        prenom_ens: "Sophie",
+                        email_ens: "sophie.martin@univ.fr"
+                    },
+                    {
+                        libelle_mat: "Algorithmique Avancée",
+                        type_eval: "EXAMEN",
+                        note: 15,
+                        coefficient: 2,
+                        libelle_per: "Semestre 1",
+                        date_eval: "2024-12-10",
+                        nb_credit: 5,
+                        nom_ens: "Martin",
+                        prenom_ens: "Sophie",
+                        email_ens: "sophie.martin@univ.fr"
+                    },
+                    {
+                        libelle_mat: "Base de Données",
+                        type_eval: "TP",
+                        note: 14,
+                        coefficient: 1,
+                        libelle_per: "Semestre 1",
+                        date_eval: "2024-11-05",
+                        nb_credit: 4,
+                        nom_ens: "Dubois",
+                        prenom_ens: "Pierre",
+                        email_ens: "pierre.dubois@univ.fr"
+                    },
+                    {
+                        libelle_mat: "Base de Données",
+                        type_eval: "EXAMEN",
+                        note: 12,
+                        coefficient: 2,
+                        libelle_per: "Semestre 1",
+                        date_eval: "2024-12-15",
+                        nb_credit: 4,
+                        nom_ens: "Dubois",
+                        prenom_ens: "Pierre",
+                        email_ens: "pierre.dubois@univ.fr"
+                    },
+                    {
+                        libelle_mat: "Réseaux Informatiques",
+                        type_eval: "DEVOIR",
+                        note: 11,
+                        coefficient: 1,
+                        libelle_per: "Semestre 1",
+                        date_eval: "2024-10-25",
+                        nb_credit: 6,
+                        nom_ens: "Leroy",
+                        prenom_ens: "Marie",
+                        email_ens: "marie.leroy@univ.fr"
+                    },
+                    {
+                        libelle_mat: "Développement Web",
+                        type_eval: "PROJET",
+                        note: 18,
+                        coefficient: 2,
+                        libelle_per: "Semestre 1",
+                        date_eval: "2024-11-20",
+                        nb_credit: 5,
+                        nom_ens: "Moreau",
+                        prenom_ens: "Thomas",
+                        email_ens: "thomas.moreau@univ.fr"
+                    },
+                    {
+                        libelle_mat: "Anglais Technique",
+                        type_eval: "ORAL",
+                        note: 15,
+                        coefficient: 1,
+                        libelle_per: "Semestre 1",
+                        date_eval: "2024-11-15",
+                        nb_credit: 3,
+                        nom_ens: "Bernard",
+                        prenom_ens: "Claire",
+                        email_ens: "claire.bernard@univ.fr"
+                    }
+                ];
+            }
+
+            function getDemoMoyennes() {
+                return {
+                    moyenne_generale: {
+                        moyenne_generale: 13.75
+                    },
+                    moyennes_matieres: [
+                        {
+                            libelle_mat: "Algorithmique Avancée",
+                            moyenne_matiere: 15.33,
+                            nb_credit: 5,
+                            nb_evaluations: 3,
+                            statut_validation: "Validé"
+                        },
+                        {
+                            libelle_mat: "Base de Données",
+                            moyenne_matiere: 12.67,
+                            nb_credit: 4,
+                            nb_evaluations: 2,
+                            statut_validation: "Validé"
+                        },
+                        {
+                            libelle_mat: "Réseaux Informatiques",
+                            moyenne_matiere: 11.00,
+                            nb_credit: 6,
+                            nb_evaluations: 1,
+                            statut_validation: "Non validé"
+                        },
+                        {
+                            libelle_mat: "Développement Web",
+                            moyenne_matiere: 18.00,
+                            nb_credit: 5,
+                            nb_evaluations: 1,
+                            statut_validation: "Validé"
+                        },
+                        {
+                            libelle_mat: "Anglais Technique",
+                            moyenne_matiere: 15.00,
+                            nb_credit: 3,
+                            nb_evaluations: 1,
+                            statut_validation: "Validé"
+                        }
+                    ]
+                };
+            }
+        });
+    </script>
+</body>
+</html>

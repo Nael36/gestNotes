@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>📅 Gestion des Périodes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../js/auth-simple.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4361ee',
+                        secondary: '#7209b7',
+                        accent: '#4cc9f0'
+                    },
+                    screens: {
+                        'xs': '475px',
+                        'sm': '640px',
+                        'md': '768px',
+                        'lg': '1024px',
+                        'xl': '1280px',
+                        '2xl': '1536px'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @media (max-width: 375px) {
+            .tiny-text-sm { font-size: 0.75rem !important; }
+            .tiny-text-base { font-size: 0.875rem !important; }
+            .tiny-text-lg { font-size: 1rem !important; }
+            .tiny-text-xl { font-size: 1.125rem !important; }
+            .tiny-p-2 { padding: 0.5rem !important; }
+            .tiny-p-3 { padding: 0.75rem !important; }
+            .tiny-p-4 { padding: 1rem !important; }
+            .tiny-space-y-2 > * + * { margin-top: 0.5rem !important; }
+            .tiny-gap-2 { gap: 0.5rem !important; }
+        }
+        
+        @media (min-width: 640px) and (max-width: 768px) {
+            .tablet-grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+        }
+        
+        .overflow-wrap-break {
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fade-in 0.3s ease; }
+        
+        @keyframes slide-in-right {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .animate-slide-in-right { animation: slide-in-right 0.3s ease; }
+        
+        @media (hover: none) and (pointer: coarse) {
+            .touch-target {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            .touch-text {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen font-sans">
+    <!-- Navbar Responsive -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50 border-b-4 border-primary">
+        <div class="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-14 sm:h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-white text-sm sm:text-lg md:text-xl"></i>
+                    </div>
+                    <span class="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent overflow-wrap-break max-w-[120px] sm:max-w-none">
+                        GestNotes
+                    </span>
+                </a>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center gap-1 lg:gap-2">
+                    <a href="index.html" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2 text-sm sm:text-base">
+                        <i class="fas fa-home"></i> 
+                        <span class="hidden lg:inline">Accueil</span>
+                    </a>
+                    <a href="periodes.html" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg bg-primary text-white font-medium flex items-center gap-2 text-sm sm:text-base shadow-sm hover:shadow-md transition">
+                        <i class="fas fa-calendar-alt"></i> 
+                        <span class="hidden lg:inline">Périodes</span>
+                    </a>
+                    <a href="matieres.html" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2 text-sm sm:text-base">
+                        <i class="fas fa-book"></i> 
+                        <span class="hidden lg:inline">Matières</span>
+                    </a>
+                    <a href="evaluations.html" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2 text-sm sm:text-base">
+                        <i class="fas fa-chart-line"></i> 
+                        <span class="hidden lg:inline">Évaluations</span>
+                    </a>
+                </div>
+
+                <!-- User Info & Mobile Menu Button -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <!-- User Profile -->
+                    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-lg">
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-user text-white text-xs sm:text-sm"></i>
+                        </div>
+                        <span id="navbar-username" class="text-xs sm:text-sm font-medium text-slate-700 overflow-wrap-break max-w-[100px] lg:max-w-[150px]">Chargement...</span>
+                    </div>
+
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-button" class="md:hidden p-2 text-slate-600 hover:text-primary transition touch-target">
+                        <i class="fas fa-bars text-lg sm:text-xl"></i>
+                    </button>
+
+                    <!-- Déconnexion -->
+                    <button onclick="logout()" class="hidden md:flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-medium text-xs sm:text-sm">
+                        <i class="fas fa-sign-out-alt text-xs sm:text-sm"></i>
+                        <span class="hidden lg:inline">Déconnecter</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-200 animate-slide-in-right">
+                <div class="px-3 sm:px-4 py-3 space-y-2">
+                    <a href="index.html" class="block px-4 py-3 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-3">
+                        <i class="fas fa-home w-5"></i> 
+                        <span>Accueil</span>
+                    </a>
+                    <a href="periodes.html" class="block px-4 py-3 rounded-lg bg-primary text-white font-medium flex items-center gap-3">
+                        <i class="fas fa-calendar-alt w-5"></i> 
+                        <span>Périodes</span>
+                    </a>
+                    <a href="matieres.html" class="block px-4 py-3 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-3">
+                        <i class="fas fa-book w-5"></i> 
+                        <span>Matières</span>
+                    </a>
+                    <a href="evaluations.html" class="block px-4 py-3 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-3">
+                        <i class="fas fa-chart-line w-5"></i> 
+                        <span>Évaluations</span>
+                    </a>
+                    
+                    <!-- User Info Mobile -->
+                    <div class="flex items-center gap-3 px-4 py-3 bg-slate-50 rounded-lg mt-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div id="mobile-username" class="font-medium text-slate-700 text-sm">Chargement...</div>
+                            <div class="text-xs text-slate-500">Enseignant</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Déconnexion Mobile -->
+                    <button onclick="logout()" class="w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 text-red-600 font-medium transition flex items-center gap-3 mt-2">
+                        <i class="fas fa-sign-out-alt w-5"></i> 
+                        <span>Déconnexion</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 via-blue-600 to-blue-700 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8">
+            <div class="py-6 sm:py-8 md:py-10 lg:py-12">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
+                    <!-- Partie gauche -->
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6">
+                        <a href="index.html" class="order-2 sm:order-1 bg-white/20 hover:bg-white/30 text-white px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg transition-all duration-200 flex items-center gap-2 w-fit hover:shadow-md active:scale-95 touch-target">
+                            <i class="fas fa-arrow-left text-sm sm:text-base"></i>
+                            <span class="whitespace-nowrap text-sm sm:text-base">Retour</span>
+                        </a>
+                        
+                        <div class="order-1 sm:order-2 flex-1 min-w-0">
+                            <h1 class="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold flex flex-col sm:flex-row sm:items-center gap-2 md:gap-3 mb-2">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-calendar-alt text-lg sm:text-xl md:text-2xl"></i>
+                                    <span class="truncate overflow-wrap-break tiny-text-xl">Gestion des Périodes</span>
+                                </div>
+                            </h1>
+                            <p class="text-sm sm:text-base md:text-lg text-blue-100/90 leading-tight overflow-wrap-break">
+                                Gérez les trimestres et semestres académiques facilement
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Partie droite -->
+                    <div class="order-3 mt-4 lg:mt-0">
+                        <button onclick="openModal()" class="w-full sm:w-auto bg-white text-blue-600 hover:text-blue-700 px-4 sm:px-5 py-3 sm:py-3.5 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-blue-500/20 touch-target text-sm sm:text-base">
+                            <i class="fas fa-plus-circle text-base sm:text-lg"></i>
+                            <span class="whitespace-nowrap">Nouvelle Période</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+        <!-- Filtres et recherche -->
+        <div class="bg-white rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 mb-4 sm:mb-6 flex flex-col lg:flex-row gap-4 items-start lg:items-center">
+            <div class="flex-1 w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Rechercher une période</label>
+                <input type="text" id="search-input" placeholder="Rechercher par libellé..." 
+                       class="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base touch-text">
+            </div>
+            <div class="flex flex-col xs:flex-row gap-2 w-full lg:w-auto">
+                <select id="filter-type" class="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base flex-1 xs:flex-none touch-text">
+                    <option value="">Tous les types</option>
+                    <option value="semestre">Semestre</option>
+                    <option value="trimestre">Trimestre</option>
+                </select>
+                <select id="filter-year" class="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base flex-1 xs:flex-none touch-text">
+                    <option value="">Toutes les années</option>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 hover:shadow-lg transition-all tiny-p-3">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-calendar text-blue-600 text-sm sm:text-base md:text-xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm text-gray-500 tiny-text-sm">Total</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-bold text-gray-800 tiny-text-lg" id="total-periodes">0</div>
+                <div class="text-xs sm:text-sm text-gray-600 tiny-text-base">Périodes</div>
+            </div>
+
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 hover:shadow-lg transition-all tiny-p-3">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-check-circle text-green-600 text-sm sm:text-base md:text-xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm text-gray-500 tiny-text-sm">Actives</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-bold text-gray-800 tiny-text-lg" id="active-periodes">0</div>
+                <div class="text-xs sm:text-sm text-gray-600 tiny-text-base">Périodes</div>
+            </div>
+
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 hover:shadow-lg transition-all tiny-p-3">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-clock text-purple-600 text-sm sm:text-base md:text-xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm text-gray-500 tiny-text-sm">En cours</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-bold text-gray-800 tiny-text-lg" id="current-periodes">0</div>
+                <div class="text-xs sm:text-sm text-gray-600 tiny-text-base">Périodes</div>
+            </div>
+
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 hover:shadow-lg transition-all tiny-p-3">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-hourglass-half text-orange-600 text-sm sm:text-base md:text-xl"></i>
+                    </div>
+                    <span class="text-xs sm:text-sm text-gray-500 tiny-text-sm">Futures</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-bold text-gray-800 tiny-text-lg" id="future-periodes">0</div>
+                <div class="text-xs sm:text-sm text-gray-600 tiny-text-base">Périodes</div>
+            </div>
+        </div>
+
+        <!-- Liste des périodes -->
+        <div class="bg-white rounded-xl sm:rounded-2xl shadow overflow-hidden">
+            <div class="p-4 sm:p-6 border-b border-gray-200">
+                <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2 sm:gap-3">
+                    <i class="fas fa-list text-primary text-sm sm:text-base md:text-lg"></i>
+                    <span class="overflow-wrap-break">Liste des Périodes Académiques</span>
+                </h2>
+            </div>
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full min-w-[600px]">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Libellé</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Début</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fin</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durée</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="periodes-table" class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td colspan="7" class="px-4 sm:px-6 py-8 sm:py-12 text-center text-gray-500">
+                                <div class="flex flex-col items-center gap-3 sm:gap-4">
+                                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-spinner fa-spin text-xl sm:text-2xl md:text-3xl text-gray-400"></i>
+                                    </div>
+                                    <p class="text-sm sm:text-base font-medium text-gray-600">Chargement des périodes...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal d'ajout/modification -->
+    <div id="modal-periode" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 max-w-md w-full mx-auto animate-fade-in">
+            <div class="flex items-center justify-between mb-4 sm:mb-6">
+                <h3 class="text-lg sm:text-xl md:text-2xl font-bold flex items-center gap-2 sm:gap-3">
+                    <i class="fas fa-calendar-plus text-primary text-base sm:text-lg md:text-xl"></i>
+                    <span id="modal-title">Ajouter une Période</span>
+                </h3>
+                <button onclick="closeModal()" class="p-1 sm:p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
+                    <i class="fas fa-times text-lg sm:text-xl"></i>
+                </button>
+            </div>
+            <form id="form-periode" class="space-y-3 sm:space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Code de la période *</label>
+                    <input type="text" id="code-per" required 
+                           class="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base touch-text"
+                           placeholder="Ex: S1_2025" maxlength="20">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Libellé de la période *</label>
+                    <input type="text" id="libelle-per" required 
+                           class="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base touch-text"
+                           placeholder="Ex: Semestre 1 - 2025/2026" maxlength="100">
+                </div>
+                <div class="grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Date de début *</label>
+                        <input type="date" id="debut-per" required 
+                               class="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base touch-text">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Date de fin *</label>
+                        <input type="date" id="fin-per" required 
+                               class="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base touch-text">
+                    </div>
+                </div>
+                <div class="text-xs text-gray-500">
+                    * Champs obligatoires
+                </div>
+                <div class="flex flex-col xs:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4">
+                    <button type="submit" class="flex-1 bg-primary text-white py-2.5 sm:py-3 rounded-lg font-medium hover:bg-primary-dark transition text-sm sm:text-base touch-target">
+                        <i class="fas fa-save mr-2"></i> Enregistrer
+                    </button>
+                    <button type="button" onclick="closeModal()" class="flex-1 bg-gray-200 text-gray-700 py-2.5 sm:py-3 rounded-lg font-medium hover:bg-gray-300 transition text-sm sm:text-base touch-target">
+                        <i class="fas fa-times mr-2"></i> Annuler
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script principal -->
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let periodes = [];
+        let currentPeriode = null;
+        let periodeToDelete = null;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Page Périodes initialisée');
+            
+            // Menu mobile
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+                
+                // Fermer le menu en cliquant à l'extérieur
+                document.addEventListener('click', (e) => {
+                    if (!mobileMenu.contains(e.target) && !mobileMenuButton.contains(e.target)) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // Charger les périodes
+            loadPeriodes();
+            
+            // Mettre à jour le nom d'utilisateur
+            updateUsername();
+            
+            // Initialiser les événements
+            initEvents();
+        });
+
+        // Mettre à jour le nom d'utilisateur
+        function updateUsername() {
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user) {
+                    const displayName = `${user.prenom} ${user.nom}`;
+                    const navbarUser = document.getElementById('navbar-username');
+                    const mobileUser = document.getElementById('mobile-username');
+                    
+                    if (navbarUser) navbarUser.textContent = displayName;
+                    if (mobileUser) mobileUser.textContent = displayName;
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        // Initialiser les événements
+        function initEvents() {
+            // Recherche
+            const searchInput = document.getElementById('search-input');
+            const filterType = document.getElementById('filter-type');
+            const filterYear = document.getElementById('filter-year');
+            
+            if (searchInput) searchInput.addEventListener('input', filterPeriodes);
+            if (filterType) filterType.addEventListener('change', filterPeriodes);
+            if (filterYear) filterYear.addEventListener('change', filterPeriodes);
+            
+            // Formulaire
+            const form = document.getElementById('form-periode');
+            if (form) {
+                form.addEventListener('submit', handleSubmit);
+            }
+            
+            // Fermer le modal en cliquant sur le fond
+            const modal = document.getElementById('modal-periode');
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        closeModal();
+                    }
+                });
+            }
+            
+            // Fermer avec Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                    closeDeleteModal();
+                }
+            });
+        }
+
+        // ==================== MODAL DÉCONNEXION ====================
+        function deconnexion() {
+            // Créer le modal de déconnexion
+            const modalHTML = `
+                <div id="logoutModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black bg-opacity-50">
+                    <div class="bg-white rounded-xl shadow-xl max-w-md w-full animate-fade-in">
+                        <!-- Header -->
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-lg">
+                                    <i class="fas fa-sign-out-alt text-red-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800">Déconnexion</h3>
+                                    <p class="text-sm text-gray-500">Confirmez la déconnexion</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="px-6 py-4">
+                            <p class="text-gray-700 mb-4">
+                                Êtes-vous sûr de vouloir vous déconnecter ?
+                            </p>
+                            
+                            <div class="p-3 bg-red-50 border border-red-100 rounded-lg">
+                                <div class="flex items-start gap-2">
+                                    <i class="fas fa-info-circle text-red-500 mt-0.5"></i>
+                                    <p class="text-sm text-red-700">
+                                        Vous devrez vous reconnecter pour accéder à nouveau à votre compte.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
+                            <div class="flex gap-3">
+                                <button onclick="closeLogoutModal()" 
+                                        class="flex-1 px-4 py-2.5 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition">
+                                    Annuler
+                                </button>
+                                <button onclick="confirmLogout()" 
+                                        class="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition flex items-center justify-center gap-2">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Se déconnecter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Empêcher le scroll sur le body
+            document.body.style.overflow = 'hidden';
+            
+            // Fermer le modal en cliquant à l'extérieur
+            const logoutModal = document.getElementById('logoutModal');
+            logoutModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeLogoutModal();
+                }
+            });
+        }
+        window.deconnexion = deconnexion;
+
+        // Fermer le modal de déconnexion
+        function closeLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            if (modal) {
+                modal.remove();
+                document.body.style.overflow = '';
+            }
+        }
+        window.closeLogoutModal = closeLogoutModal;
+
+        // Confirmer la déconnexion
+        function confirmLogout() {
+            localStorage.removeItem('user');
+            window.location.href = '../auth-fixed.html';
+        }
+
+        // ==================== CRUD PÉRIODES ====================
+
+        // Charger les périodes
+        async function loadPeriodes() {
+            try {
+                showLoading(true);
+                
+                const response = await fetch(`${API_URL}/periodes`);
+                
+                if (!response.ok) {
+                    throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+                }
+                
+                periodes = await response.json();
+                console.log('Périodes chargées:', periodes.length);
+                
+                updateStatistics();
+                displayPeriodes(periodes);
+                
+            } catch (error) {
+                console.error('Erreur chargement:', error);
+                showError('Impossible de charger les périodes. Vérifiez la connexion au serveur.');
+                
+                // Données de démonstration
+                periodes = getDemoData();
+                updateStatistics();
+                displayPeriodes(periodes);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Données de démonstration
+        function getDemoData() {
+            return [
+                {
+                    code_per: "S1_2025",
+                    libelle_per: "Semestre 1 - 2025/2026",
+                    debut_per: "2025-09-01",
+                    fin_per: "2026-01-31"
+                },
+                {
+                    code_per: "S2_2026",
+                    libelle_per: "Semestre 2 - 2025/2026",
+                    debut_per: "2026-02-01",
+                    fin_per: "2026-06-30"
+                },
+                {
+                    code_per: "T1_2025",
+                    libelle_per: "Trimestre 1 - 2025/2026",
+                    debut_per: "2025-09-01",
+                    fin_per: "2025-11-30"
+                },
+                {
+                    code_per: "T2_2025",
+                    libelle_per: "Trimestre 2 - 2025/2026",
+                    debut_per: "2025-12-01",
+                    fin_per: "2026-02-28"
+                }
+            ];
+        }
+
+        // Afficher le chargement
+        function showLoading(show) {
+            const tbody = document.getElementById('periodes-table');
+            if (!tbody) return;
+            
+            if (show) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-4 sm:px-6 py-8 sm:py-12 text-center text-gray-500">
+                            <div class="flex flex-col items-center gap-3 sm:gap-4">
+                                <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-spinner fa-spin text-xl sm:text-2xl md:text-3xl text-gray-400"></i>
+                                </div>
+                                <p class="text-sm sm:text-base font-medium text-gray-600">Chargement des périodes...</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Afficher les périodes
+        function displayPeriodes(periodesList) {
+            const tbody = document.getElementById('periodes-table');
+            if (!tbody) return;
+            
+            if (!periodesList || periodesList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-4 sm:px-6 py-8 sm:py-12 text-center text-gray-500">
+                            <div class="flex flex-col items-center gap-3 sm:gap-4">
+                                <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-calendar-plus text-xl sm:text-2xl md:text-3xl text-gray-400"></i>
+                                </div>
+                                <p class="text-sm sm:text-base font-medium text-gray-600">Aucune période trouvée</p>
+                                <button onclick="openModal()" 
+                                        class="px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-bold hover:shadow-lg transition flex items-center gap-2 text-sm sm:text-base touch-target">
+                                    <i class="fas fa-plus-circle"></i> Ajouter une période
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const rows = periodesList.map((periode, index) => {
+                const today = new Date();
+                const debut = new Date(periode.debut_per);
+                const fin = new Date(periode.fin_per);
+                
+                // Calculer la durée
+                const durationMs = fin - debut;
+                const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
+                
+                // Déterminer le statut
+                let status = '';
+                let statusClass = '';
+                let statusIcon = '';
+                
+                if (today < debut) {
+                    status = 'À venir';
+                    statusClass = 'bg-gray-100 text-gray-800';
+                    statusIcon = 'fa-clock';
+                } else if (today > fin) {
+                    status = 'Terminée';
+                    statusClass = 'bg-blue-100 text-blue-800';
+                    statusIcon = 'fa-check-circle';
+                } else {
+                    status = 'En cours';
+                    statusClass = 'bg-green-100 text-green-800';
+                    statusIcon = 'fa-play-circle';
+                }
+                
+                // Formater les dates
+                const debutFormatted = formatDate(periode.debut_per);
+                const finFormatted = formatDate(periode.fin_per);
+                
+                return `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <span class="inline-flex items-center gap-2 px-2 py-1 bg-gray-100 text-gray-700 rounded-lg font-medium text-xs sm:text-sm">
+                                <i class="fas fa-hashtag text-xs"></i> ${periode.code_per}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="font-medium text-gray-900 text-sm sm:text-base overflow-wrap-break">${periode.libelle_per}</div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                            <span class="inline-flex items-center gap-2">
+                                <i class="fas fa-calendar-day text-gray-400 text-xs sm:text-sm"></i>
+                                ${debutFormatted}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                            <span class="inline-flex items-center gap-2">
+                                <i class="fas fa-calendar-day text-gray-400 text-xs sm:text-sm"></i>
+                                ${finFormatted}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                            <span class="inline-flex items-center gap-2">
+                                <i class="fas fa-hourglass-half text-gray-400 text-xs sm:text-sm"></i>
+                                ${durationDays} jours
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <span class="inline-flex items-center gap-2 px-2 py-1 text-xs font-semibold rounded-full ${statusClass}">
+                                <i class="fas ${statusIcon} text-xs"></i> ${status}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                            <div class="flex items-center gap-2">
+                                <button onclick="editPeriode('${periode.code_per}')" 
+                                        class="p-2 w-8 h-8 sm:w-9 sm:h-9 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition transform hover:scale-110 touch-target"
+                                        title="Modifier">
+                                    <i class="fas fa-edit text-xs sm:text-sm"></i>
+                                </button>
+                                <button onclick="showDeleteModal('${periode.code_per}', '${periode.libelle_per.replace(/'/g, "\\'").replace(/"/g, '\\"')}')" 
+                                        class="p-2 w-8 h-8 sm:w-9 sm:h-9 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition transform hover:scale-110 touch-target"
+                                        title="Supprimer">
+                                    <i class="fas fa-trash text-xs sm:text-sm"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            tbody.innerHTML = rows;
+        }
+
+        // Formater une date
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+
+        // Mettre à jour les statistiques
+        function updateStatistics() {
+            const today = new Date();
+            
+            let total = periodes.length;
+            let active = 0;
+            let current = 0;
+            let future = 0;
+            
+            periodes.forEach(periode => {
+                const debut = new Date(periode.debut_per);
+                const fin = new Date(periode.fin_per);
+                
+                if (today >= debut && today <= fin) {
+                    active++;
+                }
+                if (today <= fin) {
+                    current++;
+                }
+                if (today < debut) {
+                    future++;
+                }
+            });
+            
+            document.getElementById('total-periodes').textContent = total;
+            document.getElementById('active-periodes').textContent = active;
+            document.getElementById('current-periodes').textContent = current;
+            document.getElementById('future-periodes').textContent = future;
+        }
+
+        // Filtrer les périodes
+        function filterPeriodes() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const typeFilter = document.getElementById('filter-type').value;
+            const yearFilter = document.getElementById('filter-year').value;
+            
+            const filtered = periodes.filter(periode => {
+                const matchesSearch = !searchTerm || 
+                    periode.libelle_per.toLowerCase().includes(searchTerm) ||
+                    periode.code_per.toLowerCase().includes(searchTerm);
+                
+                const matchesType = !typeFilter || 
+                    (typeFilter === 'semestre' && periode.code_per.toLowerCase().includes('s')) ||
+                    (typeFilter === 'trimestre' && periode.code_per.toLowerCase().includes('t'));
+                
+                const matchesYear = !yearFilter || 
+                    periode.code_per.includes(yearFilter) ||
+                    periode.libelle_per.includes(yearFilter);
+                
+                return matchesSearch && matchesType && matchesYear;
+            });
+            
+            displayPeriodes(filtered);
+        }
+
+        // ==================== MODAL AJOUT/MODIFICATION ====================
+
+        // Ouvrir le modal
+        function openModal() {
+            currentPeriode = null;
+            document.getElementById('modal-title').textContent = 'Ajouter une Période';
+            document.getElementById('code-per').readOnly = false;
+            document.getElementById('code-per').value = '';
+            document.getElementById('libelle-per').value = '';
+            
+            // Dates par défaut
+            const today = new Date();
+            const nextMonth = new Date(today);
+            nextMonth.setMonth(today.getMonth() + 1);
+            
+            document.getElementById('debut-per').value = today.toISOString().split('T')[0];
+            document.getElementById('fin-per').value = nextMonth.toISOString().split('T')[0];
+            
+            document.getElementById('modal-periode').classList.remove('hidden');
+        }
+        window.openModal = openModal;
+
+        // Fermer le modal
+        function closeModal() {
+            document.getElementById('modal-periode').classList.add('hidden');
+            document.getElementById('form-periode').reset();
+            currentPeriode = null;
+        }
+        window.closeModal = closeModal;
+
+        // Modifier une période
+        function editPeriode(code) {
+            const periode = periodes.find(p => p.code_per === code);
+            if (!periode) {
+                showError('Période non trouvée');
+                return;
+            }
+            
+            currentPeriode = periode;
+            document.getElementById('modal-title').textContent = 'Modifier la Période';
+            document.getElementById('code-per').value = periode.code_per;
+            document.getElementById('libelle-per').value = periode.libelle_per;
+            document.getElementById('debut-per').value = periode.debut_per;
+            document.getElementById('fin-per').value = periode.fin_per;
+            document.getElementById('code-per').readOnly = true;
+            
+            document.getElementById('modal-periode').classList.remove('hidden');
+        }
+        window.editPeriode = editPeriode;
+
+        // ==================== MODAL SUPPRESSION ====================
+
+        // Afficher le modal de suppression
+        function showDeleteModal(code, libelle) {
+            // Sauvegarder les données de la période à supprimer
+            periodeToDelete = { code, libelle };
+            
+            // Créer le modal de suppression
+            const modalHTML = `
+                <div id="deleteModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black bg-opacity-50">
+                    <div class="bg-white rounded-xl shadow-xl max-w-md w-full animate-fade-in">
+                        <!-- Header -->
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-lg">
+                                    <i class="fas fa-exclamation-triangle text-red-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800">Supprimer la période</h3>
+                                    <p class="text-sm text-gray-500">Confirmez la suppression</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="px-6 py-4">
+                            <p class="text-gray-700 mb-4">
+                                Voulez-vous vraiment supprimer la période :
+                            </p>
+                            
+                            <div class="mb-4 p-4 bg-gray-50 rounded-lg">
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-medium text-gray-600">Code :</span>
+                                        <span class="font-semibold text-gray-800">${code}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-medium text-gray-600">Libellé :</span>
+                                        <span class="font-semibold text-gray-800">${libelle}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-3 bg-red-50 border border-red-100 rounded-lg">
+                                <div class="flex items-start gap-2">
+                                    <i class="fas fa-info-circle text-red-500 mt-0.5"></i>
+                                    <p class="text-sm text-red-700">
+                                        Cette action est irréversible. Toutes les données associées seront supprimées.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
+                            <div class="flex gap-3">
+                                <button onclick="closeDeleteModal()" 
+                                        class="flex-1 px-4 py-2.5 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition">
+                                    Annuler
+                                </button>
+                                <button onclick="confirmDelete()" 
+                                        class="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition flex items-center justify-center gap-2">
+                                    <i class="fas fa-trash"></i>
+                                    Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Ajouter le modal au body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Empêcher le scroll sur le body
+            document.body.style.overflow = 'hidden';
+            
+            // Fermer le modal en cliquant à l'extérieur
+            const deleteModal = document.getElementById('deleteModal');
+            deleteModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeDeleteModal();
+                }
+            });
+        }
+        window.showDeleteModal = showDeleteModal;
+
+        // Fermer le modal de suppression
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            if (modal) {
+                modal.classList.remove('animate-fade-in');
+                modal.classList.add('animate-fade-out');
+                
+                setTimeout(() => {
+                    modal.remove();
+                    document.body.style.overflow = '';
+                    periodeToDelete = null;
+                }, 300);
+            }
+        }
+        window.closeDeleteModal = closeDeleteModal;
+
+        // Confirmer la suppression
+        async function confirmDelete() {
+            if (!periodeToDelete) return;
+            
+            try {
+                // Animation de chargement sur le bouton
+                const deleteBtn = document.querySelector('button[onclick="confirmDelete()"]');
+                const originalText = deleteBtn.innerHTML;
+                deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                deleteBtn.disabled = true;
+                
+                // Appel API pour suppression côté serveur
+                const response = await fetch(`${API_URL}/periodes/${periodeToDelete.code}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la suppression');
+                }
+                
+                // Suppression côté client
+                periodes = periodes.filter(p => p.code_per !== periodeToDelete.code);
+                updateStatistics();
+                displayPeriodes(periodes);
+                
+                // Fermer le modal
+                closeDeleteModal();
+                
+                // Afficher notification de succès
+                showSuccess(`Période "${periodeToDelete.libelle}" supprimée avec succès.`);
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                
+                // Réactiver le bouton
+                const deleteBtn = document.querySelector('button[onclick="confirmDelete()"]');
+                if (deleteBtn) {
+                    deleteBtn.innerHTML = originalText;
+                    deleteBtn.disabled = false;
+                }
+                
+                // Afficher notification d'erreur
+                showError('Erreur lors de la suppression. Veuillez réessayer.');
+            }
+        }
+
+        // ==================== GESTION FORMULAIRE ====================
+
+        // Gérer la soumission du formulaire
+        async function handleSubmit(event) {
+            event.preventDefault();
+            
+            const formData = {
+                code_per: document.getElementById('code-per').value.trim(),
+                libelle_per: document.getElementById('libelle-per').value.trim(),
+                debut_per: document.getElementById('debut-per').value,
+                fin_per: document.getElementById('fin-per').value
+            };
+            
+            // Validation
+            if (!formData.code_per || !formData.libelle_per || !formData.debut_per || !formData.fin_per) {
+                showError('Tous les champs sont obligatoires');
+                return;
+            }
+            
+            if (new Date(formData.fin_per) <= new Date(formData.debut_per)) {
+                showError('La date de fin doit être après la date de début');
+                return;
+            }
+            
+            try {
+                let successMessage = '';
+                let method = 'POST';
+                let url = `${API_URL}/periodes`;
+                
+                if (currentPeriode) {
+                    // Mise à jour
+                    method = 'PUT';
+                    url = `${API_URL}/periodes/${currentPeriode.code_per}`;
+                    
+                    // Mise à jour côté client
+                    const index = periodes.findIndex(p => p.code_per === currentPeriode.code_per);
+                    if (index !== -1) {
+                        periodes[index] = formData;
+                    }
+                    
+                    successMessage = 'Période modifiée avec succès';
+                } else {
+                    // Vérifier si le code existe déjà
+                    if (periodes.some(p => p.code_per === formData.code_per)) {
+                        showError('Ce code de période existe déjà');
+                        return;
+                    }
+                    
+                    // Ajout côté client
+                    periodes.push(formData);
+                    
+                    successMessage = 'Période créée avec succès';
+                }
+                
+                // Appel API
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erreur lors de l\'enregistrement');
+                }
+                
+                closeModal();
+                updateStatistics();
+                displayPeriodes(periodes);
+                showSuccess(successMessage);
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                showError('Erreur lors de l\'enregistrement');
+            }
+        }
+
+        // ==================== NOTIFICATIONS ====================
+
+        function showSuccess(message) {
+            showNotification(message, 'success');
+        }
+
+        function showError(message) {
+            showNotification(message, 'error');
+        }
+
+        function showNotification(message, type) {
+            // Créer la notification
+            const notification = document.createElement('div');
+            const colors = {
+                'success': 'bg-green-500',
+                'error': 'bg-red-500',
+                'info': 'bg-blue-500'
+            };
+            const icons = {
+                'success': 'fa-check-circle',
+                'error': 'fa-exclamation-circle',
+                'info': 'fa-info-circle'
+            };
+            
+            notification.className = `fixed top-4 right-4 z-50 animate-fade-in`;
+            notification.innerHTML = `
+                <div class="${colors[type]} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 min-w-[300px]">
+                    <i class="fas ${icons[type]} text-xl"></i>
+                    <span class="flex-1 font-medium">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 transition">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Supprimer automatiquement après 5 secondes
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+</script>
+</body>
+</html>

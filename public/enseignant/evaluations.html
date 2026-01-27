@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>📊 Saisie des Évaluations - GestNotes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4361ee',
+                        secondary: '#7209b7',
+                        accent: '#f72585'
+                    },
+                    screens: {
+                        'xs': '475px',
+                        'sm': '640px',
+                        'md': '768px',
+                        'lg': '1024px',
+                        'xl': '1280px',
+                        '2xl': '1536px'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Optimisations pour très petits écrans */
+        @media (max-width: 375px) {
+            .tiny-text-xs { font-size: 0.7rem !important; }
+            .tiny-text-sm { font-size: 0.8rem !important; }
+            .tiny-text-base { font-size: 0.9rem !important; }
+            .tiny-text-lg { font-size: 1rem !important; }
+            .tiny-text-xl { font-size: 1.125rem !important; }
+            .tiny-p-2 { padding: 0.5rem !important; }
+            .tiny-p-3 { padding: 0.75rem !important; }
+            .tiny-p-4 { padding: 1rem !important; }
+            .tiny-gap-2 { gap: 0.5rem !important; }
+            .tiny-gap-3 { gap: 0.75rem !important; }
+        }
+        
+        /* Pour éviter les débordements horizontaux */
+        .overflow-wrap-break {
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+        
+        /* Scrollbar personnalisée */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        
+        /* Animations */
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fade-in 0.3s ease; }
+        
+        /* Optimisation pour les touches tactiles */
+        @media (hover: none) and (pointer: coarse) {
+            .touch-target {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            .touch-text {
+                font-size: 16px;
+            }
+            .touch-select {
+                font-size: 16px;
+            }
+            .touch-input {
+                font-size: 16px;
+            }
+        }
+        
+        /* Styles spécifiques pour le tableau */
+        @media (max-width: 768px) {
+            .table-responsive {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .table-responsive table {
+                min-width: 700px;
+            }
+            .mobile-stack {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+            .mobile-full-width {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+    
+    <!-- Navbar Responsive -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50 border-b-4 border-primary">
+        <div class="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-14 sm:h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-white text-sm sm:text-lg md:text-xl"></i>
+                    </div>
+                    <span class="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent overflow-wrap-break max-w-[120px] sm:max-w-none">
+                        GestNotes
+                    </span>
+                </a>
+                
+                <!-- Desktop Menu (caché sur mobile) -->
+                <div class="hidden md:flex items-center gap-1 lg:gap-2">
+                    <a href="index.html" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2 text-sm sm:text-base">
+                        <i class="fas fa-home"></i> 
+                        <span class="hidden lg:inline">Accueil</span>
+                    </a>
+                    <a href="periodes.html" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2 text-sm sm:text-base">
+                        <i class="fas fa-calendar-alt"></i> 
+                        <span class="hidden lg:inline">Périodes</span>
+                    </a>
+                    <a href="matieres.html" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-2 text-sm sm:text-base">
+                        <i class="fas fa-book"></i> 
+                        <span class="hidden lg:inline">Matières</span>
+                    </a>
+                    <a href="evaluations.html" class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg bg-primary text-white font-medium flex items-center gap-2 text-sm sm:text-base shadow-sm hover:shadow-md transition">
+                        <i class="fas fa-clipboard-check"></i> 
+                        <span class="hidden lg:inline">Évaluations</span>
+                    </a>
+                </div>
+
+                <!-- User Info & Mobile Menu Button -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <!-- User Profile (Desktop) -->
+                    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-lg">
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-xs sm:text-sm"></i>
+                        </div>
+                        <span id="navbar-username" class="text-xs sm:text-sm font-medium text-slate-700 overflow-wrap-break max-w-[100px] lg:max-w-[150px]">Chargement...</span>
+                    </div>
+
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-btn" class="md:hidden p-2 text-slate-600 hover:text-primary transition touch-target">
+                        <i class="fas fa-bars text-lg sm:text-xl"></i>
+                    </button>
+
+                    <!-- Déconnexion (Desktop) -->
+                    <button onclick="deconnexion()" class="hidden md:flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-medium text-xs sm:text-sm">
+                        <i class="fas fa-sign-out-alt text-xs sm:text-sm"></i>
+                        <span class="hidden lg:inline">Déconnecter</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu (déroulant) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-200 animate-fade-in">
+            <div class="px-3 sm:px-4 py-3 space-y-2">
+                <a href="index.html" class="block px-4 py-3 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-3">
+                    <i class="fas fa-home w-5"></i> 
+                    <span>Accueil</span>
+                </a>
+                <a href="periodes.html" class="block px-4 py-3 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-3">
+                    <i class="fas fa-calendar-alt w-5"></i> 
+                    <span>Périodes</span>
+                </a>
+                <a href="matieres.html" class="block px-4 py-3 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition flex items-center gap-3">
+                    <i class="fas fa-book w-5"></i> 
+                    <span>Matières</span>
+                </a>
+                <a href="evaluations.html" class="block px-4 py-3 rounded-lg bg-primary text-white font-medium flex items-center gap-3">
+                    <i class="fas fa-clipboard-check w-5"></i> 
+                    <span>Évaluations</span>
+                </a>
+                
+                <!-- User Info Mobile -->
+                <div class="flex items-center gap-3 px-4 py-3 bg-slate-50 rounded-lg mt-4">
+                    <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div id="mobile-username" class="font-medium text-slate-700 text-sm overflow-wrap-break">Chargement...</div>
+                        <div class="text-xs text-slate-500">Enseignant</div>
+                    </div>
+                </div>
+                
+                <!-- Déconnexion Mobile -->
+                <button onclick="deconnexion()" class="w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 text-red-600 font-medium transition flex items-center gap-3 mt-2">
+                    <i class="fas fa-sign-out-alt w-5"></i> 
+                    <span>Déconnexion</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Responsive -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div class="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-10 lg:py-12">
+            <!-- Bouton Retour -->
+            <div class="mb-4 sm:mb-6 md:mb-8">
+                <a href="index.html" class="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg transition-all duration-200 hover:shadow-md active:scale-95 w-fit touch-target">
+                    <i class="fas fa-arrow-left text-sm sm:text-base"></i>
+                    <span class="whitespace-nowrap text-sm sm:text-base">Retour</span>
+                </a>
+            </div>
+
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
+                <!-- Partie gauche : Titre et description -->
+                <div class="flex-1 min-w-0">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4 mb-2 sm:mb-3">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-clipboard-check text-xl sm:text-2xl md:text-3xl text-white/90"></i>
+                            <h1 class="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold truncate overflow-wrap-break tiny-text-xl">
+                                Saisie des Évaluations
+                            </h1>
+                        </div>
+                    </div>
+                    <p class="text-sm sm:text-base md:text-lg text-white/90 leading-relaxed max-w-3xl overflow-wrap-break">
+                        Attribuer et modifier les notes des étudiants
+                    </p>
+                </div>
+
+                <!-- Partie droite : Année académique -->
+                <div class="lg:self-start mt-4 lg:mt-0">
+                    <div class="bg-white/20 backdrop-blur-lg rounded-xl px-4 py-3 sm:px-5 sm:py-4 border border-white/10 hover:bg-white/25 transition-all duration-300 shadow-lg hover:shadow-xl min-w-[180px] sm:min-w-[200px]">
+                        <p class="text-xs sm:text-sm text-white/80 mb-1 uppercase tracking-wider font-medium overflow-wrap-break">
+                            Année Académique
+                        </p>
+                        <p class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white overflow-wrap-break">
+                            2025-2026
+                        </p>
+                        <p class="text-xs text-white/60 mt-2 flex items-center gap-1">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>En cours</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Responsive -->
+    <main class="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+        <!-- Filtres de sélection -->
+        <div class="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 md:mb-8">
+            <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
+                <i class="fas fa-filter text-primary text-sm sm:text-base md:text-lg"></i>
+                <span class="overflow-wrap-break">Sélection des Paramètres</span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+                <!-- Classe -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1 sm:mb-2">
+                        <i class="fas fa-layer-group text-primary text-xs sm:text-sm mr-1 sm:mr-2"></i>
+                        Classe <span class="text-red-500">*</span>
+                    </label>
+                    <select id="select-classe" onchange="chargerMatieres()" class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-slate-200 rounded-lg sm:rounded-xl focus:border-primary focus:ring-2 sm:focus:ring-4 focus:ring-primary focus:ring-opacity-20 transition text-sm sm:text-base touch-select">
+                        <option value="">-- Sélectionner une classe --</option>
+                    </select>
+                </div>
+
+                <!-- Matière -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1 sm:mb-2">
+                        <i class="fas fa-book text-primary text-xs sm:text-sm mr-1 sm:mr-2"></i>
+                        Matière <span class="text-red-500">*</span>
+                    </label>
+                    <select id="select-matiere" onchange="chargerPeriodes()" class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-slate-200 rounded-lg sm:rounded-xl focus:border-primary focus:ring-2 sm:focus:ring-4 focus:ring-primary focus:ring-opacity-20 transition text-sm sm:text-base touch-select" disabled>
+                        <option value="">-- Sélectionner une matière --</option>
+                    </select>
+                </div>
+
+                <!-- Période -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1 sm:mb-2">
+                        <i class="fas fa-calendar-alt text-primary text-xs sm:text-sm mr-1 sm:mr-2"></i>
+                        Période <span class="text-red-500">*</span>
+                    </label>
+                    <select id="select-periode" onchange="chargerEtudiants()" class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-slate-200 rounded-lg sm:rounded-xl focus:border-primary focus:ring-2 sm:focus:ring-4 focus:ring-primary focus:ring-opacity-20 transition text-sm sm:text-base touch-select" disabled>
+                        <option value="">-- Sélectionner une période --</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Barre de recherche -->
+            <div class="mt-4 sm:mt-6">
+                <label class="block text-sm font-bold text-slate-700 mb-1 sm:mb-2">
+                    <i class="fas fa-search text-primary text-xs sm:text-sm mr-1 sm:mr-2"></i>
+                    Rechercher un étudiant (Nom ou Prénom)
+                </label>
+                <input 
+                    type="text" 
+                    id="search-etudiant" 
+                    placeholder="Tapez un nom ou un prénom..." 
+                    onkeyup="filtrerEtudiants()"
+                    class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-slate-200 rounded-lg sm:rounded-xl focus:border-primary focus:ring-2 sm:focus:ring-4 focus:ring-primary focus:ring-opacity-20 transition text-sm sm:text-base touch-input"
+                >
+            </div>
+        </div>
+
+        <!-- Tableau des étudiants avec notes -->
+        <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden">
+            <div class="p-4 sm:p-6 border-b-2 border-slate-100 flex flex-col xs:flex-row xs:items-center xs:justify-between gap-3 sm:gap-4 mobile-stack">
+                <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 flex items-center gap-2 sm:gap-3">
+                    <i class="fas fa-users text-primary text-sm sm:text-base md:text-lg"></i>
+                    <span class="overflow-wrap-break">Liste des Étudiants</span>
+                    <span id="count-etudiants" class="text-sm sm:text-base md:text-lg font-normal text-slate-500 hidden sm:inline"></span>
+                </h2>
+                <button 
+                    onclick="enregistrerToutesLesNotes()"
+                    id="btn-enregistrer-tout"
+                    class="px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg sm:rounded-xl font-bold hover:shadow-lg transition transform hover:scale-105 active:scale-95 hidden w-full xs:w-auto touch-target text-sm sm:text-base"
+                >
+                    <i class="fas fa-save mr-1 sm:mr-2"></i>
+                    <span class="whitespace-nowrap">Enregistrer Toutes les Notes</span>
+                </button>
+            </div>
+            
+            <!-- Compteur mobile -->
+            <div class="px-4 sm:px-6 py-2 bg-slate-50 border-b border-slate-200 sm:hidden">
+                <span id="count-etudiants-mobile" class="text-sm text-slate-600"></span>
+            </div>
+            
+            <div class="table-responsive custom-scrollbar">
+                <table class="w-full min-w-[600px]">
+                    <thead class="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+                        <tr>
+                            <th class="px-3 xs:px-4 sm:px-6 py-3 text-left text-xs font-bold uppercase tracking-wider w-12 sm:w-16">
+                                #
+                            </th>
+                            <th class="px-3 xs:px-4 sm:px-6 py-3 text-left text-xs font-bold uppercase tracking-wider min-w-[120px] sm:min-w-[150px]">
+                                <i class="fas fa-user mr-1 sm:mr-2 text-xs sm:text-sm"></i>
+                                <span class="hidden xs:inline">Nom</span>
+                                <span class="xs:hidden">N</span>
+                            </th>
+                            <th class="px-3 xs:px-4 sm:px-6 py-3 text-left text-xs font-bold uppercase tracking-wider min-w-[120px] sm:min-w-[150px]">
+                                <i class="fas fa-user mr-1 sm:mr-2 text-xs sm:text-sm"></i>
+                                <span class="hidden xs:inline">Prénom</span>
+                                <span class="xs:hidden">P</span>
+                            </th>
+                            <th class="px-3 xs:px-4 sm:px-6 py-3 text-left text-xs font-bold uppercase tracking-wider min-w-[150px] sm:min-w-[200px] hidden sm:table-cell">
+                                <i class="fas fa-envelope mr-1 sm:mr-2 text-xs sm:text-sm"></i>
+                                Email
+                            </th>
+                            <th class="px-3 xs:px-4 sm:px-6 py-3 text-center text-xs font-bold uppercase tracking-wider w-32 sm:w-48">
+                                <i class="fas fa-star mr-1 sm:mr-2 text-xs sm:text-sm"></i>
+                                <span class="hidden xs:inline">Note / 20</span>
+                                <span class="xs:hidden">Note</span>
+                            </th>
+                            <th class="px-3 xs:px-4 sm:px-6 py-3 text-center text-xs font-bold uppercase tracking-wider w-24 sm:w-32">
+                                <i class="fas fa-cog mr-1 sm:mr-2 text-xs sm:text-sm"></i>
+                                <span class="hidden xs:inline">Actions</span>
+                                <span class="xs:hidden">Act</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableau-etudiants" class="divide-y divide-slate-200">
+                        <tr>
+                            <td colspan="6" class="px-4 sm:px-6 py-8 sm:py-12 md:py-16 text-center">
+                                <div class="flex flex-col items-center gap-3 sm:gap-4">
+                                    <div class="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-slate-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-info-circle text-xl sm:text-2xl md:text-3xl lg:text-4xl text-slate-300"></i>
+                                    </div>
+                                    <div class="text-center">
+                                        <p class="text-slate-600 text-sm sm:text-base md:text-lg font-medium mb-1">
+                                            Sélectionnez les paramètres
+                                        </p>
+                                        <p class="text-slate-500 text-xs sm:text-sm">
+                                            Choisissez une classe, matière et période
+                                        </p>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Actions mobiles (fixées en bas sur mobile) -->
+            <div id="mobile-actions" class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg p-3 sm:hidden z-40 hidden">
+                <div class="flex gap-2">
+                    <button 
+                        onclick="enregistrerToutesLesNotes()"
+                        class="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-bold text-sm touch-target flex items-center justify-center gap-2"
+                    >
+                        <i class="fas fa-save"></i>
+                        <span>Enregistrer</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modale de confirmation -->
+    <div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-md w-full mx-auto animate-fade-in">
+            <div class="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg sm:rounded-xl flex items-center justify-center">
+                    <i class="fas fa-check-circle text-white text-base sm:text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-800">Notes enregistrées</h3>
+                    <p class="text-gray-600 text-xs sm:text-sm mt-1">Les modifications ont été sauvegardées</p>
+                </div>
+            </div>
+            <p class="text-gray-700 text-sm sm:text-base mb-4 sm:mb-6" id="confirmation-message">
+                Les notes ont été enregistrées avec succès.
+            </p>
+            <button onclick="closeConfirmationModal()" class="w-full px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-lg sm:rounded-xl font-bold hover:shadow-lg transition text-sm sm:text-base touch-target">
+                <i class="fas fa-check mr-2"></i>Continuer
+            </button>
+        </div>
+    </div>
+
+    <!-- Script principal -->
+    <script src="js/evaluations.js"></script>
+</body>
+</html>
