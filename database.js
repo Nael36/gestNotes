@@ -483,4 +483,13 @@ module.exports = {
   // Étudiants
   getEtudiantByEmail,
   createEtudiant,
+
+  // Inscriptions
+  getInscriptions,
+  getInscriptionsByAnnee,
+  createInscription,
+
+  // Évaluations
+  getEvaluations,
+  createEvaluation,
 };

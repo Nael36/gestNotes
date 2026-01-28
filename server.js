@@ -11,7 +11,6 @@ const db = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 console.log('🔄 Démarrage du serveur GestNotes...');
 
 // ==================== MIDDLEWARES ====================
@@ -272,59 +271,54 @@ app.post('/api/auth/enseignant/login', async (req, res) => {
 // ==================== DÉMARRAGE DU SERVEUR ====================
 console.log('🔄 Tentative de connexion à la base de données...');
 
+// Test de connexion à la base de données
 db.query('SELECT NOW()')
     .then(() => {
         console.log('✅ Connexion PostgreSQL réussie');
-        app.listen(PORT, () => {
-            console.log('\n' + '='.repeat(60));
-            console.log('🚀 SERVEUR GESTNOTES DÉMARRÉ AVEC SUCCÈS');
-            console.log('='.repeat(60));
-            console.log(`📡 URL: http://localhost:${PORT}`);
-            console.log(`📁 Public: ${path.join(__dirname, 'public')}`);
-            console.log(`💾 Database: ${process.env.DB_NAME || 'BDevaluation'}`);
-            console.log('\n📋 ROUTES DISPONIBLES:');
-            console.log('   🔐 POST /api/auth/enseignant/login');
-            console.log('   🔐 POST /api/auth/enseignant/register');
-            console.log('   🔐 POST /api/auth/etudiant/login');
-            console.log('   🔐 POST /api/auth/etudiant/register');
-            console.log('   🔐 POST /api/auth/admin/login');
-            if (apiRoutes) {
-                console.log('   📚 GET  /api/classes');
-                console.log('   📖 GET  /api/matieres');
-                console.log('   📅 GET  /api/periodes');
-            }
-            if (evaluationsRoutes) {
-                console.log('   📊 GET  /api/evaluations');
-                console.log('   📊 POST /api/evaluations');
-                console.log('   📍 GET  /api/inscriptions/classe/:code_cl');
-            }
-            if (etudiantRoutes) {
-                console.log('   👨‍🎓 GET  /api/etudiants');
-                console.log('   👨‍🎓 POST /api/etudiants');
-                console.log('   👨‍🎓 GET  /api/etudiants/:matricule');
-            }
-            if (inscriptionRoutes) {
-                console.log('   📝 GET  /api/inscriptions');
-                console.log('   📝 POST /api/inscriptions');
-            }
-            console.log('\n💡 TESTER:');
-            console.log(`   http://localhost:${PORT}/auth-fixed.html`);
-            console.log('='.repeat(60) + '\n');
-        });
     })
     .catch((err) => {
-        console.error('\n' + '='.repeat(60));
         console.error('❌ ÉCHEC CONNEXION BASE DE DONNÉES');
-        console.error('='.repeat(60));
         console.error('Erreur:', err.message);
-        console.error('\n💡 VÉRIFICATIONS:');
-        console.error('   1. PostgreSQL est démarré ?');
-        console.error('   2. Base "BDevaluation" existe ?');
-        console.error('   3. Fichier .env correct ?');
-        console.error('   4. Mot de passe correct ?\n');
-        console.error('🔧 COMMANDES:');
-        console.error('   psql -U postgres');
-        console.error('   CREATE DATABASE BDevaluation;');
-        console.error('   \\i schema.sql\n');
-        process.exit(1);
     });
+
+// Export de l'app pour Vercel
+module.exports = app;
+
+// Démarrage du serveur en local uniquement (pas sur Vercel)
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log('\n' + '='.repeat(60));
+        console.log('🚀 SERVEUR GESTNOTES DÉMARRÉ AVEC SUCCÈS');
+        console.log('='.repeat(60));
+        console.log(`📡 URL: http://localhost:${PORT}`);
+        console.log(`📁 Public: ${path.join(__dirname, 'public')}`);
+        console.log('\n📋 ROUTES DISPONIBLES:');
+        console.log('   🔐 POST /api/auth/enseignant/login');
+        console.log('   🔐 POST /api/auth/enseignant/register');
+        console.log('   🔐 POST /api/auth/etudiant/login');
+        console.log('   🔐 POST /api/auth/etudiant/register');
+        console.log('   🔐 POST /api/auth/admin/login');
+        if (apiRoutes) {
+            console.log('   📚 GET  /api/classes');
+            console.log('   📖 GET  /api/matieres');
+            console.log('   📅 GET  /api/periodes');
+        }
+        if (evaluationsRoutes) {
+            console.log('   📊 GET  /api/evaluations');
+            console.log('   📊 POST /api/evaluations');
+            console.log('   📍 GET  /api/inscriptions/classe/:code_cl');
+        }
+        if (etudiantRoutes) {
+            console.log('   👨‍🎓 GET  /api/etudiants');
+            console.log('   👨‍🎓 POST /api/etudiants');
+            console.log('   👨‍🎓 GET  /api/etudiants/:matricule');
+        }
+        if (inscriptionRoutes) {
+            console.log('   📝 GET  /api/inscriptions');
+            console.log('   📝 POST /api/inscriptions');
+        }
+        console.log('\n💡 TESTER:');
+        console.log(`   http://localhost:${PORT}/auth-fixed.html`);
+        console.log('='.repeat(60) + '\n');
+    });
+}
