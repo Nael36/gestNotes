@@ -42,7 +42,7 @@ const pool = new Pool({
   user: process.env.DB_USER || "postgres", // Utilisateur de la base (postgres par défaut)
   host: process.env.DB_HOST || "localhost", // Hôte de la base (localhost par défaut)
   database: process.env.DB_NAME || "BDevaluation", // Nom de la base de données
-  password: "@ngejosue36", // Mot de passe (doit être configuré dans .env)
+  password: process.env.DB_PASS, // Mot de passe (doit être configuré dans .env)
   port: process.env.DB_PORT || 5432, // Port PostgreSQL (5432 par défaut)
   // Options de sécurité et performance
   ssl:
@@ -52,6 +52,10 @@ const pool = new Pool({
   max: 20, // Maximum de connexions dans le pool
   idleTimeoutMillis: 30000, // Fermer les connexions inactives après 30s
   connectionTimeoutMillis: 2000, // Timeout pour les requêtes longues
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 // ==================== TEST CONNEXION ====================
