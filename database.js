@@ -52,10 +52,6 @@ const pool = new Pool({
   max: 20, // Maximum de connexions dans le pool
   idleTimeoutMillis: 30000, // Fermer les connexions inactives après 30s
   connectionTimeoutMillis: 2000, // Timeout pour les requêtes longues
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
 });
 
 // ==================== TEST CONNEXION ====================
