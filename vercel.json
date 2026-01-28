@@ -4,12 +4,44 @@
     {
       "src": "server.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/(.*\\.(html|css|js|png|jpg|jpeg|gif|ico|svg))",
+      "dest": "/public/$1"
+    },
+    {
+      "src": "/enseignant/(.*)",
+      "dest": "/public/enseignant/$1"
+    },
+    {
+      "src": "/Etudiant/(.*)",
+      "dest": "/public/Etudiant/$1"
+    },
+    {
+      "src": "/Admin/(.*)",
+      "dest": "/public/Admin/$1"
+    },
+    {
+      "src": "/js/(.*)",
+      "dest": "/public/js/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/public/auth-fixed.html"
+    },
+    {
       "src": "/(.*)",
-      "dest": "server.js"
+      "dest": "/server.js"
     }
   ]
 }
